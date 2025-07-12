@@ -1,0 +1,17 @@
+{% load static %}
+
+<div class="space-y-1">
+  <label for="{{ field.id_for_label }}" class="block font-medium text-sm text-zinc-700 dark:text-zinc-300">
+    {{ field.label }}
+  </label>
+
+  {{ field }}
+
+  {% if field.help_text %}
+    <p class="text-xs text-zinc-500 dark:text-zinc-400">{{ field.help_text }}</p>
+  {% endif %}
+
+  {% for error in field.errors %}
+    <p class="text-sm text-red-500">{{ error }}</p>
+  {% endfor %}
+</div>

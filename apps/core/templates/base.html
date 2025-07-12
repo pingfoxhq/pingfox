@@ -5,7 +5,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{% static 'css/build.css' %}">
+    <link rel="stylesheet" href="{% static 'build.css' %}">
+    <script src="{% static 'htmx.min.js' %}"></script>
+    {% include 'core/partials/favicon.html' %}
 
     <title>
         {% block title %}
@@ -14,12 +16,13 @@
     </title>
 </head>
 
-<body>
-    
+<body class="font-mono bg-fox-bg text-fox-text" hx-boost="true">
+    {% include 'core/partials/navbar.html' %}
+    {% include 'core/partials/messages.html' %}
     {% block content %}
-        
+
     {% endblock content %}
-        
+
 </body>
 
 </html>

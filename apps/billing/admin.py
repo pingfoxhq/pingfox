@@ -7,3 +7,4 @@ class PlanAdmin(admin.ModelAdmin):
     list_display = ("name", "slug", "price", "is_active")
     prepopulated_fields = {"slug": ("name",)}
     readonly_fields = ["created_at"]
+    ordering = ("ranking", "name")

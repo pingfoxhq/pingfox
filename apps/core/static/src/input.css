@@ -1,1 +1,46 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/forms";
+
+/* The theme is default to dark, we don't have light mode */
+
+@theme {
+    --color-fox-orange: #f97316;
+    --color-fox-bg: #141619;
+    --color-fox-text: #f3f4f6;
+    /* Status Colors */
+    --color-success: #22c55e;
+    /* Emerald-500 */
+    --color-warning: #eab308;
+    /* Yellow-500 */
+    --color-danger: #ef4444;
+    /* Red-500 */
+    --color-info: #38bdf8;
+    /* Sky-400 */
+
+    /* Light versions for backgrounds */
+    --color-success-bg: #1e3a29;
+    /* very dark green tint */
+    --color-warning-bg: #3d2e1e;
+    --color-danger-bg: #3f1d1d;
+    --color-info-bg: #1e3a4d;
+
+    /* Border accent versions */
+    --color-success-border: #16a34a;
+    /* Emerald-600 */
+    --color-warning-border: #ca8a04;
+    /* Yellow-600 */
+    --color-danger-border: #dc2626;
+    /* Red-600 */
+    --color-info-border: #0ea5e9;
+    /* Sky-500 */
+
+    --color-box-bg: #1f2327;
+    --color-box-alt: #252a2e
+
+
+
+}
+
+label {
+    @apply block text-sm font-medium text-gray-300
+}

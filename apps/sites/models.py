@@ -120,3 +120,38 @@ class Site(models.Model):
         """
         return f"/collect/{self.site_id}.js"
 
+
+class PageView(models.Model):
+    site = models.ForeignKey(
+        Site,
+        on_delete=models.CASCADE,
+        related_name="pageviews",
+        verbose_name=_("Site"),
+    )
+    url = models.URLField(
+        verbose_name=_("URL"),
+        help_text=_("The URL of the page that was viewed."),
+    )
+    referrer = models.URLField(
+        blank=True,
+        verbose_name=_("Referrer"),
+        help_text=_("The URL of the page that referred the user to this page."),
+    )
+    user_agent = models.TextField(
+        verbose_name=_("User Agent"),
+        help_text=_("The user agent string of the browser making the request."),
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name=_("Created At"),
+        help_text=_("The date and time when the page view was recorded."),
+    )
+
+    class Meta:
+        verbose_name = _("Page View")
+        verbose_name_plural = _("Page Views")
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.site.name} - {self.url} ({self.created_at})"

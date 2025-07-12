@@ -24,7 +24,7 @@ class Plan(models.Model):
         max_digits=10,
         decimal_places=2,
         help_text=_(
-            "The price of the billing plan in the smallest currency unit (e.g., cents)."
+            "The price of the billing plan in the INR (₹)."
         ),
     )
     features = models.TextField(
@@ -64,6 +64,16 @@ class Plan(models.Model):
         verbose_name=_("Created At"),
         auto_now_add=True,
         help_text=_("The date and time when the plan was created."),
+    )
+    highlighted = models.BooleanField(
+        verbose_name=_("Highlighted"),
+        default=False,
+        help_text=_("Whether this plan should be highlighted in the UI."),
+    )
+    ranking = models.PositiveIntegerField(
+        verbose_name=_("Ranking"),
+        default=0,
+        help_text=_("The ranking of the plan for display purposes."),
     )
 
     def __str__(self):

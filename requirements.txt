@@ -3,10 +3,13 @@ beautifulsoup4==4.13.4
 bs4==0.0.2
 certifi==2025.7.9
 charset-normalizer==3.4.2
+click==8.2.1
+colorama==0.4.6
 Django==5.2.4
 django-resized==1.0.3
 django_dramatiq==0.13.0
 dramatiq==1.18.0
+h11==0.16.0
 idna==3.10
 pillow==11.3.0
 prometheus_client==0.22.1
@@ -18,3 +21,5 @@ sqlparse==0.5.3
 typing_extensions==4.14.1
 tzdata==2025.2
 urllib3==2.5.0
+uvicorn==0.35.0
+whitenoise==6.9.0

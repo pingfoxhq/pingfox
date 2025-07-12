@@ -114,11 +114,6 @@ class Site(models.Model):
     def __str__(self):
         return f"{self.name} ({self.domain})"
 
-    def js_url(self):
-        """
-        Returns the URL for the JavaScript tracking script for this site.
-        """
-        return f"/collect/{self.site_id}.js"
 
 
 class PageView(models.Model):

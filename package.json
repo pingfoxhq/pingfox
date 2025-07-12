@@ -5,5 +5,9 @@
   },
   "devDependencies": {
     "@tailwindcss/forms": "^0.5.10"
+  },
+  "scripts": {
+    "watch-css": "npx @tailwindcss/cli -i apps/core/static/src/input.css -o apps/core/static/build.css --watch",
+    "build-css": "npx @tailwindcss/cli -i apps/core/static/src/input.css -o apps/core/static/build.css"
   }
 }

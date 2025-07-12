@@ -1,5 +1,8 @@
 # Makefile
 
+build:
+	docker-compose build
+
 up:
 	docker-compose up --build
 
@@ -19,7 +22,13 @@ shell:
 	docker-compose exec server python manage.py shell
 
 build-css:
-	docker-compose exec server npm run build-css  # Adjust this if you're using Tailwind CLI
+	docker-compose exec server npm run build-css
+
+watch-css:
+	docker-compose exec server npm run watch-css
 
 collectstatic:
 	docker-compose exec server python manage.py collectstatic --noinput
+
+dev:
+	docker compose -f compose.dev.yaml watch

@@ -25,7 +25,7 @@ def logout_view(request):
     Handle user logout.
     """
     logout(request)
-    return redirect("core:home")
+    return redirect("home")
 
 def register_view(request):
     """

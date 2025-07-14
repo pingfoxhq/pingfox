@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Team Details - {{ team.name }}{% endblock %}
+
+{% block content %}
+
+<div class="max-w-6xl mx-auto px-6 py-10 text-white">
+  <div class="flex items center justify-between mb-6">
+    <h1 class="text-3xl font-bold">{{ team.name }}</h1>
+    <div class="flex items-center space-x-4">
+      {% if request.user.is_authenticated and request.user == team.owner %}
+      <a href="{% url 'teams:transfer_ownership' team.slug %}" class="btn btn-sm btn-outline btn-accent">Transfer Ownership</a>
+      {% endif %}
+      <a href="{% url 'teams:list' %}" class="btn btn-sm btn-secondary">Back to Teams</a>
+    </div>
+    </div>
+    <div class="card bg-base-200 shadow-md border border-base-300">
+        <div class="card-body">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="card-title text-xl">{{ team.name }}</h2>
+                {% if team.logo %}
+                <img src="{{ team.logo.url }}" alt="{{ team.name }} Logo" class="w-10 h-10 rounded-md object-cover">
+                {% endif %}
+            </div>
+            <p class="text-sm text-gray-400 mb-2">Slug: <code>{{ team.slug }}</code></p>
+            <p class="text-sm text-gray-400 mb-4">Owner: {{ team.owner.get_full_name|default:team.owner.username }}</p>
+            <p class="text-sm text-gray-400 mb-4">Description: {{ team.description|default:"No description provided." }}</p>
+            <p class="text-sm text-gray-400 mb-4">Created on: {{ team.created_at|date:"F j, Y" }}</p>
+            <p class="text-sm text-gray-400 mb-4">Members:</p>
+            <ul class="list-disc pl-5">
+                {% for member in team.members.all %}
+                <li>{{ member.get_full_name|default:member.username }}{% if member.is_owner %} (Owner){% endif %}</li>
+                {% empty %}
+                <li>No members in this team.</li>
+                {% endfor %}
+            </ul>
+            {% if request.user.is_authenticated and request.user == team.owner %}
+            <div class="mt-6">
+                <a href="" class="btn btn-sm btn-primary">Edit Team</a>
+                <a href="{% url 'teams:transfer_ownership' team.slug %}" class="btn btn-sm btn-error">Transfer Ownership</a>
+
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock content %}

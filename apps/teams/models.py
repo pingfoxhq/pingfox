@@ -31,6 +31,14 @@ class Team(models.Model):
         verbose_name=_("Created At"),
         help_text=_("The date and time when the team was created."),
     )
+    members = models.ManyToManyField(
+        User,
+        through='TeamMember',
+        related_name="teams",
+        verbose_name=_("Team Members"),
+        help_text=_("Users who are members of the team."),
+    )
+
     logo = ResizedImageField(
         upload_to="uploads/team_logos/",
         size=[200, 200],
@@ -53,10 +61,15 @@ class Team(models.Model):
         if not isinstance(new_owner, User):
             raise ValueError(_("New owner must be a User instance."))
 
+        # Change the role of the old owner to 'member' or similar
+        TeamMember.objects.filter(user=self.owner, team=self).update(role='member')
         # Logic to transfer ownership (e.g., update team owner field)
         # Assuming there's an 'owner' field in the Team model
         self.owner = new_owner
         self.save()
+        # Also add the new owner as a member if not already a member
+        if not self.members.filter(id=new_owner.id).exists():
+            TeamMember.objects.get_or_create(user=new_owner, team=self, role='admin')
 
     class Meta:
         verbose_name = _("Team")
@@ -94,7 +107,7 @@ class TeamMember(models.Model):
     team = models.ForeignKey(
         Team,
         on_delete=models.CASCADE,
-        related_name="members",
+        related_name="team_membership",
         verbose_name=_("Team"),
         help_text=_("The team to which the user belongs."),
     )
@@ -165,4 +178,4 @@ class TeamInvitation(models.Model):
             self.accepted = True
             self.save()
             return True
-        return False        
+        return False

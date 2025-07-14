@@ -5,7 +5,7 @@
     <div class="flex justify-between h-16 items-center">
 
       <!-- Logo -->
-      <div class="flex items-center space-x-2">
+      <div class="flex items-center space-x-6">
 
         {% if request.user.is_authenticated %}
         <a href="{% url 'home' %}" class="flex items-center space-x-2" hx-boost="true">
@@ -19,7 +19,7 @@
           {% if request.user.is_authenticated and request.user.team_members.exists %}
           <div class="dropdown">
 
-            <div tabindex="0" role="button" class="btn btn-lg">
+            <div tabindex="0" role="button" class="btn btn-ghost">
               <span class="hidden md:inline"><img src="{{ current_team.logo.url }}" alt="" class="w-6 h-6 rounded-full inline-block mr-2">{{ current_team }}</span>
               {% for team in request.user.team_members.all %}
               {% if team.team.id == request.user.current_team_id %}

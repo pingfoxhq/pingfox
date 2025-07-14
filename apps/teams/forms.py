@@ -18,3 +18,20 @@ class TeamCreationForm(ModelForm):
         fields = [
             "name",
         ]
+
+class OwnershipTransferForm(ModelForm):
+    """
+    Form for transferring ownership of a team.
+    """
+
+    new_owner = CharField(
+        max_length=150,
+        help_text="Enter the username of the new team owner.",
+        widget=TextInput(attrs={"placeholder": "New Owner Username"}),
+    )
+
+    class Meta:
+        model = Team
+        fields = [
+            "new_owner",
+        ]

@@ -1,4 +1,4 @@
-from .models import Team, TeamMember
+from .models import Team
 
 def team_context_processor(request):
     """
@@ -10,10 +10,11 @@ def team_context_processor(request):
 
     if current_team_id:
         try:
-            current_team = Team.objects.get(id=current_team_id, members__user=request.user)
+            current_team = Team.objects.get(id=current_team_id, members=request.user)
             team_members = current_team.members.all()
         except Team.DoesNotExist:
-            pass
+            current_team = request.user.teams.first()
+            request.session['current_team_id'] = current_team.id
 
     return {
         'current_team': current_team,

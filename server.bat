@@ -1,1 +1,1 @@
-python -m uvicorn pingfox.asgi:application --reload
+python -m uvicorn pingfox.asgi:application --reload --reload-include *.html --reload-include *.css --reload-include *.js

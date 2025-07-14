@@ -1,5 +1,43 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/forms";
+@plugin "daisyui";
+
+
+
+@plugin "daisyui/theme" {
+    name: "PingFox";
+    default: true;
+    prefersdark: false;
+    color-scheme: "dark";
+    --color-base-100: oklch(27% 0.006 286.033);
+    --color-base-200: #141619;
+    --color-base-300: oklch(27% 0.006 286.033);
+    --color-base-content: oklch(97% 0 0);
+    --color-primary: #f97316;
+    --color-primary-content: #f3f4f6;
+    --color-secondary: oklch(26% 0 0);
+    --color-secondary-content: oklch(98% 0.003 247.858);
+    --color-accent: #f97316;
+    --color-accent-content: #f3f4f6;
+    --color-neutral: oklch(26% 0.007 34.298);
+    --color-neutral-content: oklch(98% 0 0);
+    --color-info: oklch(70% 0.165 254.624);
+    --color-info-content: oklch(28% 0.091 267.935);
+    --color-success: oklch(76% 0.177 163.223);
+    --color-success-content: oklch(26% 0.051 172.552);
+    --color-warning: oklch(82% 0.189 84.429);
+    --color-warning-content: oklch(27% 0.077 45.635);
+    --color-error: #ef4444;
+    --color-error-content: oklch(100% 0 0);
+    --radius-selector: 0.25rem;
+    --radius-field: 0.25rem;
+    --radius-box: 0.25rem;
+    --size-selector: 0.25rem;
+    --size-field: 0.25rem;
+    --border: 2px;
+    --depth: 1;
+    --noise: 0;
+}
 
 /* The theme is default to dark, we don't have light mode */
 
@@ -7,40 +45,30 @@
     --color-fox-orange: #f97316;
     --color-fox-bg: #141619;
     --color-fox-text: #f3f4f6;
-    /* Status Colors */
     --color-success: #22c55e;
-    /* Emerald-500 */
     --color-warning: #eab308;
-    /* Yellow-500 */
     --color-danger: #ef4444;
-    /* Red-500 */
     --color-info: #38bdf8;
-    /* Sky-400 */
 
-    /* Light versions for backgrounds */
     --color-success-bg: #1e3a29;
-    /* very dark green tint */
     --color-warning-bg: #3d2e1e;
     --color-danger-bg: #3f1d1d;
     --color-info-bg: #1e3a4d;
-
-    /* Border accent versions */
     --color-success-border: #16a34a;
-    /* Emerald-600 */
     --color-warning-border: #ca8a04;
-    /* Yellow-600 */
     --color-danger-border: #dc2626;
-    /* Red-600 */
     --color-info-border: #0ea5e9;
-    /* Sky-500 */
 
-    --color-box-bg: #1f2327;
-    --color-box-alt: #252a2e
-
+    --color-box-bg: #171A1D;
+    --color-box-alt: #262A2E;
+    --color-box-alt-hover: #30363C;
 
 
 }
+.clearablefileinput{
+    @apply file-input;
+}
 
-label {
-    @apply block text-sm font-medium text-gray-300
+#div_id_avatar{
+    @apply space-y-3;
 }

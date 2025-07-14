@@ -1,6 +1,6 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="PingFox">
 
 <head>
     <meta charset="UTF-8">
@@ -16,7 +16,8 @@
     </title>
 </head>
 
-<body class="font-mono bg-fox-bg text-fox-text" hx-boost="true">
+<body class="bg-fox-bg text-fox-text min-h-screen" hx-boost="true">
+    {% include 'core/partials/loader.html' %}
     {% include 'core/partials/navbar.html' %}
     {% include 'core/partials/messages.html' %}
     {% block content %}

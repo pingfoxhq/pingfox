@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block title %}
+Activate your account
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center py-12 px-4">
+    <div class="max-w-md w-full">
+        <h2 class="mb-6 text-center text-3xl text-white fox-orange-text">
+            Activate Your Account
+        </h2>
+        <p class="text-center text-gray-400 mb-6 text-sm md:text-base font-light leading-tight max-w-md mx-auto">
+            Please enter the activation code sent to your email to activate your account.
+        </p>
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+            {{ form | crispy }}
+            <div>
+                <button type="submit"
+                    class="w-full flex justify-center py-2 px-4 border border-transparent  shadow-sm text-white bg-fox-orange hover:bg-fox-orange-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-fox-orange font-semibold transition">
+                    Activate
+                </button>
+            </div>
+        </form>
+        <p class="mt-6 text-center text-sm text-gray-400">
+            Need help?
+            <a href="" class="font-medium fox-orange-text hover:underline">
+                Contact Support 
+            </a>
+        </p>
+    </div>
+</div>
+{% endblock content %}

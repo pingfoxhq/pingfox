@@ -22,7 +22,8 @@
                 <a href="#pricing" class="hover:underline">Pricing</a>
 
                 {% if user.is_authenticated %}
-                <a href="{% url 'dashboard:dashboard' %}" class="bg-white text-fox-orange font-semibold px-4 py-2 rounded-lg shadow hover:bg-gray-100">Dashboard</a>
+                <a href="{% url 'dashboard:index' %}"
+                    class="bg-white text-fox-orange font-semibold px-4 py-2 rounded-lg shadow hover:bg-gray-100">Dashboard</a>
                 {% else %}
                 <a href="{% url 'accounts:login' %}"
                     class="bg-white text-fox-orange font-semibold px-4 py-2 rounded-lg shadow hover:bg-gray-100">Login</a>
@@ -64,6 +65,10 @@
         <h3 class="text-3xl font-bold text-center mb-12">Simple Pricing</h3>
         <div class="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
             {% for plan in active_pricing_plans %}
+
+            {% if plan.visible %}
+
+
             {% if plan.highlighted %}
             <div class="bg-fox-orange text-white p-8 rounded-xl shadow-lg text-center transform scale-105">
                 <span
@@ -83,6 +88,7 @@
             {% endif %}
 
 
+            {% endif %}
             {% endfor %}
 
         </div>

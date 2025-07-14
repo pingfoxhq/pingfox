@@ -40,16 +40,29 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django_cleanup.apps.CleanupConfig",
     "apps.core.apps.CoreConfig",
+    "crispy_forms",
+    "crispy_tailwind",
     "apps.accounts.apps.AccountsConfig",
     "apps.billing.apps.BillingConfig",
     "apps.sites.apps.SitesConfig",
     "apps.forms.apps.FormsConfig",
     "apps.dashboard.apps.DashboardConfig",
+    "apps.analytics.apps.AnalyticsConfig",
+    "apps.teams.apps.TeamsConfig",
 ]
 
-AUTH_USER_MODEL = "accounts.User"
 
+LOGIN_URL = "accounts:login"
+LOGOUT_URL = "accounts:logout"
+LOGOUT_REDIRECT_URL = "home"
+LOGIN_REDIRECT_URL = "dashboard:index"
+
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
+
+CRISPY_TEMPLATE_PACK = "tailwind"
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -63,7 +76,7 @@ MIDDLEWARE = [
 ]
 
 
-INSTALLED_APPS += ["django_dramatiq"]
+INSTALLED_APPS += ["django_dramatiq", "colorfield"]
 
 DRAMATIQ_BROKER = {
     "BROKER": "dramatiq.brokers.redis.RedisBroker",
@@ -93,6 +106,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "apps.billing.context_processors.pricing_plans",
+                "apps.teams.context_processors.team_context_processor",
             ],
         },
     },
@@ -167,6 +181,12 @@ MEDIA_ROOT = BASE_DIR / "media"
 EMAIL_BACKEND = os.getenv(
     "DJANGO_EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend"
 )
+EMAIL_HOST = os.getenv("EMAIL_HOST", "smtp.gmail.com")
+EMAIL_PORT = int(os.getenv("EMAIL_PORT", 587))
+EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True").lower() in ("true", "1")
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "admin@pingfox.in")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "your-email-password")
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

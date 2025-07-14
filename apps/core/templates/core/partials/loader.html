@@ -1,0 +1,28 @@
+<!-- Sleek Thin Loading Bar -->
+<style>
+    #top-loading-bar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 0%;
+        height: 3px;
+        background: linear-gradient(90deg, #f97316, #fd8129);
+        z-index: 9999;
+        transition: width 0.4s cubic-bezier(.4, 0, .2, 1);
+    }
+</style>
+<div id="top-loading-bar"></div>
+<script>
+    // Example: Animate loading bar to 100% then hide
+    function startLoadingBar() {
+        const bar = document.getElementById('top-loading-bar');
+        bar.style.width = '0%';
+        bar.style.display = 'block';
+        setTimeout(() => bar.style.width = '100%', 200);
+        setTimeout(() => bar.style.display = 'none', 600);
+    }
+    // Call startLoadingBar() when needed
+    document.body.addEventListener("htmx:afterSettle", function (evt) {
+        startLoadingBar();
+    });
+</script>

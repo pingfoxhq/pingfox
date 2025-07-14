@@ -1,18 +1,16 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from apps.teams.utils import get_current_team
+from django.contrib import messages
+
 
 @login_required
 def dashboard_index(request):
     """
     Render the dashboard page for authenticated users.
     """
-
-    teams = request.user.team_members.all() if request.user.is_authenticated else []
-    sites = request.user.sites.all() if request.user.is_authenticated else []
-
-    if not teams:
+    print(get_current_team(request))
+    if get_current_team(request) is None:
+        messages.info(request, "Please create a team to get started.")
         return redirect('teams:create')
-    context = {
-        'sites': sites,
-    }
-    return render(request, "dashboard/index.html", context=context)
+    return render(request, "dashboard/index.html")

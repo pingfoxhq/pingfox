@@ -3,28 +3,10 @@
 {% block title %}Login{% endblock %}
 
 {% block content %}
-<div class="min-h-screen flex items-center justify-center py-12 px-4">
-    <div class="max-w-md w-full">
-        <h2 class="mb-6 text-center text-3xl text-white fox-orange-text">Sign in to your account</h2>
-        <form method="post" class="space-y-6">
-            {% csrf_token %}
-            {{ form | crispy }}
-            <div class="flex items-center justify-between">
-                <div class="text-sm dark:text-gray-400">
-                    <a href="#" class="font-medium fox-orange-text hover:underline">Forgot your password?</a>
-                </div>
-            </div>
-            <div>
-                <button type="submit"
-                    class="btn w-full btn-accent">
-                    Sign in
-                </button>
-            </div>
-        </form>
-        <p class="mt-6 text-center text-sm text-gray-400">
-            Don't have an account?
-            <a href="{% url 'accounts:register' %}" class="font-medium fox-orange-text hover:underline">Sign up</a>
-        </p>
-    </div>
-</div>
+{% include 'core/partials/create_form.html' with heading="Log in to your account" subtitle="Enter your credentials to continue" form=form button_text="Log in" %}
+
+<p class="mt-6 text-center text-sm text-gray-400">
+    Don't have an account?
+    <a href="{% url 'accounts:register' %}" class="font-medium fox-orange-text hover:underline">Sign up</a>
+</p>
 {% endblock content %}

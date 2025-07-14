@@ -4,6 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.text import slugify
 from django.core.exceptions import ValidationError
 from django_resized import ResizedImageField
+from apps.billing.models import Plan
 
 
 class Team(models.Model):
@@ -18,6 +19,14 @@ class Team(models.Model):
         unique=True,
         verbose_name=_("Team Slug"),
         help_text=_("A unique identifier for the team, used in URLs."),
+    )
+    plan = models.ForeignKey(
+        Plan,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="teams",
+        verbose_name=_("Plan"),
+        help_text=_("The billing plan associated with the team."),
     )
     owner = models.ForeignKey(
         User,
@@ -53,6 +62,27 @@ class Team(models.Model):
 
     def __str__(self):
         return self.name
+    
+    def feature_limit(self, feature_name):
+        """
+        Get the limit for a specific feature based on the team's plan.
+        """
+        if self.plan and self.plan.get_feature(feature_name) is not None:
+            return self.plan.get_feature(feature_name)
+        else:
+            return None
+        
+    def is_limit_exceeded(self, resource_type):
+        from apps.forms.models import Form  # adjust import to avoid circular
+
+        if resource_type == "forms":
+            max_allowed = self.feature_limit("forms_limit")
+            current_count = self.forms.count()
+            return max_allowed is not None and current_count >= max_allowed
+
+        # You can add more like 'members', 'integrations', etc.
+        return False
+
 
     def transfer_ownership(self, new_owner):
         """

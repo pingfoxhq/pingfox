@@ -5,9 +5,11 @@ from django.urls import path, include
 
 urlpatterns = [
     path("", include("apps.core.urls")),
-    path("accounts/", include("apps.accounts.urls")),
     path("dashboard/", include("apps.dashboard.urls")),
+    path("accounts/", include("apps.accounts.urls")),
+    path("analytics/", include("apps.analytics.urls")),
     path("sites/", include("apps.sites.urls")),
+    path("forms/", include("apps.forms.urls")),
     path("teams/", include("apps.teams.urls")),
     path("admin/", admin.site.urls),
 ]

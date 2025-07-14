@@ -1,0 +1,16 @@
+<div class="w-full border-b border-base-300 mb-6">
+        <div class="tabs tabs-boxed bg-transparent">
+            <a href="{% url 'dashboard:index' %}"
+                class="tab tab-lg tab-bordered text-sm {% if active_tab == 'dashboard' %}tab-active border-b-2 border-white text-white{% else %}text-gray-400{% endif %}">Dashboard</a>
+            <a href="{% url 'analytics:index' %}"
+                class="tab tab-lg tab-bordered text-sm {% if active_tab == 'analytics' %}tab-active border-b-2 border-white text-white{% else %}text-gray-400{% endif %}">Analytics</a>
+            <a href=""
+                class="tab tab-lg tab-bordered text-sm {% if active_tab == 'sites' %}tab-active border-b-2 border-white text-white{% else %}text-gray-400{% endif %}">Sites</a>
+            <a href="{% url 'forms:index' %}"
+                class="tab tab-lg tab-bordered text-sm {% if active_tab == 'forms' %}tab-active border-b-2 border-white text-white{% else %}text-gray-400{% endif %}">Forms</a>
+            <a href="{% url 'teams:index' %}"
+                class="tab tab-lg tab-bordered text-sm {% if active_tab == 'teams' %}tab-active border-b-2 border-white text-white{% else %}text-gray-400{% endif %}">Teams</a>
+            <a href="{% url 'accounts:index' %}"
+                class="tab tab-lg tab-bordered text-sm {% if active_tab == 'accounts' %}tab-active border-b-2 border-white text-white{% else %}text-gray-400{% endif %}">Accounts</a>
+        </div>
+    </div>

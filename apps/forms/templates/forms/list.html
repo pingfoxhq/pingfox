@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Forms{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-between">
+
+    <h1 class="text-3xl font-semibold text-white mb-2">Your Forms</h1>
+    <a href="{% url 'teams:create' %}" class="btn btn-primary btn-sm">+ Create New Form</a>
+</div>
+<p class="text-sm text-gray-400 mb-8">
+    Manage all forms created by your team.
+</p>
+{% include 'core/partials/dashboard_tab.html' with active_tab="forms" %}
+{% if forms %}
+<div class="grid grid-cols-1 gap-6">
+    {% for form in forms %}
+    <div class="bg-base-200 p-5 rounded-xl border border-base-300 hover:border-primary transition-all duration-200">
+        <div class="flex justify-between items-center mb-2">
+            <div class="flex flex-col">
+                <a href="{% url 'forms:builder' form.slug %}" class="text-lg font-medium text-white hover:underline">
+                    {{ form.name }}
+                </a>
+                <span class="text-xs text-gray-500">/{{ form.slug }}</span>
+            </div>
+            {% if form.is_active %}
+            <span class="badge badge-success text-xs">Active</span>
+            {% else %}
+            <span class="badge badge-error text-xs">Inactive</span>
+            {% endif %}
+        </div>
+        <div class="flex justify-between text-sm text-gray-400 mt-2">
+            <span>Created: {{ form.created_at|date:"M j, Y" }}</span>
+            <span>{{ form.submissions_count|default:"0" }} Submissions</span>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="text-center py-12 text-gray-400">
+    <p class="text-lg">You haven’t created any forms yet.</p>
+    <a href="{% url 'forms:create' %}" class="btn btn-outline mt-4">Create Your First Form</a>
+</div>
+{% endif %}
+{% endblock %}

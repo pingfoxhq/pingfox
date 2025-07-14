@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-
+from apps.teams.utils import get_user_teams
 def home(request):
     """
     Render the home page of the application.
@@ -15,13 +15,13 @@ def home_unauth(request):
     """
     return render(request, 'core/home.html')
 
-def test_message(request):
+
+def onboarding(request):
     """
-    Render a test messagss
+    Render the onboarding page for new users.
     """
-    messages.success(request, "This is a test message!")
-    messages.error(request, "This is an error message!")
-    messages.info(request, "This is an info message!")
-    messages.warning(request, "This is a warning message!")
-    messages.debug(request, "This is a debug message!")
-    return redirect('dashboard:index')
+    if not len(get_user_teams(request)) > 0:
+        messages.info(request, "Please create a team to get started.")
+        return redirect('teams:create')
+
+    return render(request, 'core/onboarding.html')

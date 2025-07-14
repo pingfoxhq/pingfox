@@ -4,7 +4,7 @@ from django.views.decorators.http import require_POST
 from .models import Team, TeamMember, User
 from .forms import TeamCreationForm, OwnershipTransferForm
 from django.contrib import messages
-from .utils import switch_team
+from .utils import switch_team, get_user_teams, get_current_team
 
 @login_required
 @require_POST
@@ -13,11 +13,20 @@ def switch_team_view(request):
     Switch the current team context for the user.
     """
     team_id = request.POST.get('team_id')
+    path = request.POST.get('next', 'dashboard:index')
     if not team_id:
-        return redirect('dashboard:index')
+        messages.error(request, "Invalid team selection.")
+        return redirect(path)
     switch_team(request, team_id)
-    return redirect('dashboard:index')
+    return redirect(path)
 
+@login_required
+def team_index(request):
+    """
+    Render the team index page for the authenticated user.
+    Lists all teams the user is a member of.
+    """
+    return redirect('teams:list')
 
 @login_required
 def team_create(request):
@@ -40,11 +49,12 @@ def team_list(request):
     """
     List all teams the user is a member of.
     """
-    teams = Team.objects.filter(members__in=[request.user])
+    teams = get_user_teams(request)
     if not teams:
         messages.info(request, "You are not a member of any teams.")
-        return redirect('dashboard:index')
-    return render(request, 'teams/list.html', {'teams': teams})
+        return redirect('teams:create')
+    current_team = get_current_team(request)
+    return render(request, 'teams/list.html', {'teams': teams, 'current_team': current_team})
 
 
 @login_required

@@ -34,6 +34,7 @@
               <li>
                 <form method="post" action="{% url 'teams:switch' %}">
                   {% csrf_token %}
+                  <input type="hidden" name="next" value="{{ request.path }}">
                   <button type="submit" name="team_id" value="{{ team.team.id }}"
                     class="flex items-center space-x-2 text-sm">
                     <img src="{{ team.team.logo.url }}" class="w-5 h-5 rounded-full" />
@@ -67,7 +68,7 @@
       <div class="flex items-center space-x-4 text-sm">
         {% if request.user.is_authenticated %}
         <!-- show profile picture -->
-        <a href="{% url 'accounts:edit_user_view' %}" class="flex items-center space-x-2">
+        <a href="{% url 'accounts:index' %}" class="flex items-center space-x-2">
           <img src="{{ request.user.userprofile.avatar.url }}" alt="{{ request.user.username }}'s avatar"
             class="h-8 w-8 object-cover rounded">
           <span class="hidden md:inline text-gray-300 hover:text-white">Hi, {{ request.user.username }}</span>

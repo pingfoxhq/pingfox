@@ -3,6 +3,7 @@ from . import views
 
 app_name = "teams"
 urlpatterns = [
+    path("", views.team_index, name="index"),
     path("switch/", views.switch_team_view, name="switch"),
     path("create/", views.team_create, name="create"),
     path("list/", views.team_list, name="list"),

@@ -1,6 +1,35 @@
 from django.contrib import admin
 from .models import Form, FormField, FormSubmission, FormStyle, models
 from django.utils.html import format_html
+
+@admin.register(FormSubmission)
+class FormSubmissionAdmin(admin.ModelAdmin):
+    list_display = ("form","submitted_at", "data")
+    search_fields = ("form__name", "data")
+    list_filter = ("submitted_at",)
+    raw_id_fields = ("form",)
+    list_per_page = 20
+    
+
+
+class FormFieldInline(admin.TabularInline):
+    model = FormField
+    extra = 1
+    verbose_name = "Form Field"
+    verbose_name_plural = "Form Fields"
+    fields = (
+        "field_type",
+        "label",
+        "required",
+        "name",
+        "placeholder",
+        "validation_regex",
+        "help_text",
+        "choices",
+    )
+    prepopulated_fields = {"name": ("label",)}
+
+
 class FormStyleInline(admin.TabularInline):
     model = FormStyle
     extra = 1
@@ -15,6 +44,7 @@ class FormStyleInline(admin.TabularInline):
         "custom_css_field",
     )
     readonly_fields = ("custom_css_field",)
+
     @admin.display(description="Custom CSS")
     def custom_css_field(self, obj):
         # show the custom CSS in a read-only field, and tell the user to edit it in the form style admin
@@ -34,6 +64,7 @@ class FormStyleInline(admin.TabularInline):
                 obj.custom_css,
             )
 
+
 @admin.register(Form)
 class FormAdmin(admin.ModelAdmin):
     list_display = ("name", "owner", "created_at", "team")
@@ -42,9 +73,16 @@ class FormAdmin(admin.ModelAdmin):
     prepopulated_fields = {"slug": ("name",)}
     ordering = ("-created_at",)
     raw_id_fields = ("owner", "team")
-    inlines = [FormStyleInline]
+    inlines = [FormStyleInline, FormFieldInline]
+    autocomplete_fields = ["owner", "team"]
 
     list_per_page = 20
+    
+    def get_queryset(self, request):
+        queryset = super().get_queryset(request)
+        # Use select_related to optimize queries for owner and team
+        return queryset.select_related("owner", "team")
+
 
 class FormFieldAdmin(admin.ModelAdmin):
     list_display = ("form", "field_type", "label", "required")
@@ -52,6 +90,7 @@ class FormFieldAdmin(admin.ModelAdmin):
     list_filter = ("field_type", "required")
     raw_id_fields = ("form",)
     list_per_page = 20
+
 
 @admin.register(FormStyle)
 class FormStyleAdmin(admin.ModelAdmin):

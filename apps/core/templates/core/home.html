@@ -76,13 +76,15 @@
                     Popular</span>
 
                 <h4 class="text-xl font-semibold my-2">{{ plan.name }}</h4>
-                <p class="mb-4">{{plan.features}}</p>
+                <p class="mb-4">
+                        {{plan.description |default:"No description available."}}
+                </p>
                 <p class="text-3xl font-bold">₹{{ plan.price | stringformat:'d' }}/mo</p>
             </div>
             {% else %}
             <div class="bg-white dark:bg-zinc-900 p-8 rounded-xl shadow text-center">
                 <h4 class="text-xl font-semibold mb-2">{{ plan.name }}</h4>
-                <p class="text-zinc-500 mb-4">{{ plan.features }}</p>
+                <p class="text-zinc-500 mb-4">{{ plan.description }}</p>
                 <p class="text-3xl font-bold">₹{{ plan.price | stringformat:'d' }}/mo</p>
             </div>
             {% endif %}

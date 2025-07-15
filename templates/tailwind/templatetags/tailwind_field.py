@@ -98,7 +98,7 @@ class CrispyTailwindFieldNode(template.Node):
         "datetime": base_input,
         "time": base_input,
         "checkbox": "",
-        "select": "",
+        "select": "select",
         "nullbooleanselect": "",
         "selectmultiple": "",
         "checkboxselectmultiple": "",

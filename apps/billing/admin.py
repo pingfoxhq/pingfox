@@ -10,7 +10,7 @@ DEFAULT_FEATURES = {
     "forms_enabled": "true",
     "forms_limit": "3",
     "webhooks": "true",
-    "wenhooks_limit": "3",
+    "wenhooks_limit": "3", # Same as forms_limit
     "script_badge": "false",
     "api_access": "true",
     "data_retention_days": "30",
@@ -56,7 +56,6 @@ class PlanAdmin(admin.ModelAdmin):
     ordering = ("ranking", "price")
     actions = ["add_default_features"]
     readonly_fields = ("created_at",)
-
     fieldsets = (
         (None, {
             "fields": (
@@ -72,7 +71,9 @@ class PlanAdmin(admin.ModelAdmin):
         }),
         ("Advanced Options", {
             "classes": ("collapse",),
-            "fields": ("created_at",),
+            "fields": ("created_at", "is_base_plan"),
+            "description": "These options are for advanced users. Use with caution."
+
         }),
     )
 

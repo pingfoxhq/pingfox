@@ -1,0 +1,17 @@
+{% load l10n %}
+{% load crispy_forms_filters %}
+<div class="flex space-x-4">
+    {% if field.label %}
+    <label for="{{ field.id_for_label }}"
+        class="{% if label_class %}{{ label_class }}{% else %}text-white text-sm font-bold mb-2{% endif %}{% if not inline_class %} col-form-label{% endif %}{% if field.field.required %} requiredField{% endif %}">
+        {{ field.label|safe }}{% if field.field.required %}<span class="asteriskField">*</span>{% endif %}
+    </label>
+    {% endif %}
+
+    <div id="div_{{ field.auto_id }}"
+        class="flex flex-row{% if wrapper_class %} {{ wrapper_class }}{% endif %}{% if field.css_classes %} {{ field.css_classes }}{% endif %}">
+        <input type="checkbox" {% if choice.0 in field.value or choice.0|stringformat:"s" in field.value or choice.0|stringformat:"s" == field.value|default_if_none:""|stringformat:"s" %} checked="checked" {% endif %}
+            name="{{ field.html_name }}" id="id_{{ field.html_name }}_{{ forloop.counter }}"
+            value="{{ choice|unlocalize }}" {{ field.field.widget.attrs|flatatt }} class="checkbox">
+    </div>
+</div>

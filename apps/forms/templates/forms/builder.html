@@ -1,114 +1,36 @@
-{% extends "base.html" %}
-{% block title %}Form Builder{% endblock %}
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+Create a Form
+{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-6 py-10" x-data="formBuilder()">
-  <div class="flex items-center justify-between mb-6">
-    <h1 class="text-2xl font-bold text-white">🛠️ Build Your Form</h1>
-    <div class="space-x-2">
-      <button class="btn btn-ghost btn-sm">Discard</button>
-      <button class="btn btn-primary btn-sm" @click="submit()">Save</button>
-    </div>
-  </div>
+<div class="flex items-center justify-between">
 
-  <div class="grid grid-cols-12 gap-6">
+  <h1 class="text-3xl font-semibold text-white mb-2">
+    <span class="w-full">{{ form.name }}</span>
+  </h1>
+  <a href="{% url 'forms:list' %}" class="btn btn-sm">
+    &leftarrow; Back to Forms List
+  </a>
+</div>
+<p class="text-sm text-gray-400 mb-8">
+  {{ form.description }}
+</p>
+{% include 'core/partials/dashboard_tab.html' with active_tab="forms" %}
 
-    <!-- Sidebar -->
-    <div class="col-span-3 bg-base-200 rounded-xl p-4 border border-base-300 space-y-4">
-      <h2 class="text-sm text-gray-400 uppercase font-semibold">Add Field</h2>
-      <template x-for="field in fieldTypes" :key="field.type">
-        <button class="btn btn-sm btn-outline w-full justify-start" @click="addField(field)">
-          <span x-text="field.label"></span>
-        </button>
-      </template>
-    </div>
-
-    <!-- Builder Canvas -->
-    <div class="col-span-9 bg-base-200 rounded-xl p-6 border border-base-300 min-h-[500px]">
-      <h2 class="text-md font-semibold text-white mb-4">Form Preview</h2>
-      <template x-if="fields.length === 0">
-        <p class="text-gray-500 italic text-sm">Click a field to add it to your form.</p>
-      </template>
-
-      <div class="space-y-4" x-ref="sortable" x-init="makeSortable()">
-        <template x-for="(field, index) in fields" :key="field._id">
-          <div class="card bg-base-100 border border-gray-700 shadow-sm p-4 flex flex-col gap-2">
-            <div class="flex justify-between items-center">
-              <div class="flex-1">
-                <input type="text" class="input input-sm input-bordered w-full" x-model="field.label">
-                <p class="text-xs text-gray-500 mt-1" x-text="`Type: ${field.type}`"></p>
-              </div>
-              <button class="btn btn-sm btn-error ml-4" @click="removeField(index)">✕</button>
-            </div>
-
-            <!-- Conditional Options -->
-            <template x-if="['dropdown', 'radio'].includes(field.type)">
-              <div>
-                <label class="text-sm text-gray-400">Options</label>
-                <template x-for="(opt, optIdx) in field.options" :key="optIdx">
-                  <div class="flex items-center space-x-2 mt-1">
-                    <input type="text" class="input input-xs input-bordered w-full" x-model="field.options[optIdx]">
-                    <button class="btn btn-xs btn-ghost text-error" @click="field.options.splice(optIdx, 1)">✕</button>
-                  </div>
-                </template>
-                <button class="btn btn-xs btn-outline mt-2" @click="field.options.push('New Option')">+ Add Option</button>
-              </div>
-            </template>
-          </div>
-        </template>
-      </div>
-    </div>
+<div class="flex items-center justify-between mb-6">
+  <h1 class="text-2xl font-bold text-white">🛠️ UI Builder</h1>
+  <div class="space-x-2">
+    <a href="{% url 'forms:editor' form.slug %}" class="btn btn-sm btn-outline">🔙 Switch to Schema Builder</a>
+    <button class="btn btn-primary btn-sm" hx-post="#" hx-trigger="click" hx-include="#schema-editor"
+      hx-target="#save-status" hx-swap="innerHTML">
+      💾 Save Schema
+    </button>
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-<script>
-function formBuilder() {
-  return {
-    fieldTypes: [
-      { type: 'text', label: 'Text Input' },
-      { type: 'email', label: 'Email' },
-      { type: 'textarea', label: 'Textarea' },
-      { type: 'dropdown', label: 'Dropdown' },
-      { type: 'checkbox', label: 'Checkbox' },
-      { type: 'radio', label: 'Radio' }
-    ],
-    fields: [],
-    addField(fieldType) {
-      this.fields.push({
-        _id: Date.now() + Math.random(),
-        type: fieldType.type,
-        label: fieldType.label,
-        options: ['dropdown', 'radio'].includes(fieldType.type) ? ['Option 1', 'Option 2'] : []
-      });
-    },
-    removeField(index) {
-      this.fields.splice(index, 1);
-    },
-    makeSortable() {
-      const el = this.$refs.sortable;
-      Sortable.create(el, {
-        animation: 150,
-        onEnd: (evt) => {
-          const movedItem = this.fields.splice(evt.oldIndex, 1)[0];
-          this.fields.splice(evt.newIndex, 0, movedItem);
-        }
-      });
-    },
-    submit() {
-      fetch("/api/form-builder/save/", {
-        method: "POST",
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': '{{ csrf_token }}'
-        },
-        body: JSON.stringify({ fields: this.fields })
-      })
-      .then(res => res.json())
-      .then(data => alert("Saved!"))
-      .catch(err => alert("Error saving form."));
-    }
-  };
-}
-</script>
-{% endblock %}
+<h4 class="text-lg font-semibold text-white mb-4">:TODO:</h4>
+
+{% endblock content %}

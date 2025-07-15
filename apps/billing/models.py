@@ -59,6 +59,12 @@ class Plan(models.Model):
         help_text=_("The date and time when the plan was created."),
     )
 
+    is_base_plan = models.BooleanField(
+        verbose_name=_("Is Base Plan"),
+        default=False,
+        help_text=_("Indicates if this is the base plan that all teams start with."),
+    )
+
     def __str__(self):
         return self.name
     
@@ -69,6 +75,13 @@ class Plan(models.Model):
         """
         feature = self.features.filter(key=key).first()
         return feature.value if feature else default
+    
+    @property
+    def is_pro(self):
+        """
+        Check if the plan is a Pro plan.
+        """
+        return self.get_feature("is_pro", False) == "true"
 
 
 class PlanFeature(models.Model):

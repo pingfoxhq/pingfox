@@ -14,34 +14,7 @@
 
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
   {% for team in teams %}
-  <div class="card bg-base-200 shadow-md border border-base-300">
-    <div class="card-body">
-      <div class="flex items-center justify-between mb-2">
-        <h2 class="card-title text-xl">{{ team.name }}</h2>
-        {% if team.logo %}
-        <img src="{{ team.logo.url }}" alt="{{ team.name }} Logo" class="w-10 h-10 rounded-md object-cover">
-        {% endif %}
-      </div>
-      <p class="text-sm text-gray-400 mb-2">Slug: <code>{{ team.slug }}</code></p>
-      <p class="text-sm text-gray-400 mb-4">Owner: {{ team.owner.get_full_name|default:team.owner.username }}</p>
-
-      <div class="flex items-center justify-between">
-        <a href="{% url 'teams:detail' team.slug %}" class="btn btn-sm btn-outline btn-accent">Manage</a>
-        {% if current_team != team %}
-        <form method="post" action="{% url 'teams:switch' %}">
-          {% csrf_token %}
-          <!-- current url -->
-          <input type="hidden" name="next" value="{{ request.path }}">
-          <!-- team id -->
-          <input type="hidden" name="team_id" value="{{ team.id }}">
-          <button type="submit" class="btn btn-sm btn-success">Switch</button>
-        </form>
-        {% else %}
-        <span class="badge badge-primary rounded-full">Current</span>
-        {% endif %}
-      </div>
-    </div>
-  </div>
+  {% include 'teams/partials/teams_grid.html' %}
   {% endfor %}
 </div>
 

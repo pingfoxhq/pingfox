@@ -6,6 +6,7 @@ from django_resized import ResizedImageField
 from colorfield.fields import ColorField
 from apps.teams.models import Team
 from django.utils.text import slugify
+from django.core.exceptions import ValidationError
 
 User = get_user_model()
 
@@ -22,6 +23,18 @@ def generate_auth_key(length=40):
         key = secrets.token_urlsafe(length)[:length]
         if not Form.objects.filter(auth_key=key).exists():
             return key
+        
+def generate_slug():
+    """
+    Generates a unique slug for a form.
+    
+    - Uses `secrets` to ensure uniqueness.
+    - Slugs are URL-safe and suitable for use in URLs.
+    """
+    while True:
+        slug = secrets.token_urlsafe(6)
+        if not Form.objects.filter(slug=slug).exists():
+            return slug
 
 
 class Form(models.Model):
@@ -47,6 +60,7 @@ class Form(models.Model):
     slug = models.SlugField(
         max_length=255,
         unique=True,
+        default=generate_slug,
         verbose_name=_("Slug"),
         help_text=_("A unique identifier for the form, used in URLs."),
     )
@@ -81,6 +95,12 @@ class Form(models.Model):
         help_text=_("A unique key required for authenticated form submissions."),
     )
 
+    is_locked = models.BooleanField(
+        default=False,
+        verbose_name=_("Is Locked"),
+        help_text=_("Indicates whether the form is locked for editing."),
+    )
+
     def __str__(self):
         return self.name
 
@@ -96,6 +116,9 @@ class Form(models.Model):
 
 
     def save(self, *args, **kwargs):
+        # Check if the owner is in the team
+        if not self.owner in self.team.members.all():
+            raise ValueError("Owner must be a member of the team.")
         if not self.slug:
             base_slug = slugify(self.name)
             slug = base_slug
@@ -104,7 +127,17 @@ class Form(models.Model):
                 slug = f"{base_slug}-{counter}"
                 counter += 1
             self.slug = slug
+            
         super().save(*args, **kwargs)
+
+    def clean(self):
+        """
+        Custom validation to ensure the owner is a member of the team.
+        """
+        if not self.owner in self.team.members.all():
+            raise ValidationError(
+                _("The owner must be a member of the team.")
+            )
 
 
 class FormStyle(models.Model):
@@ -182,6 +215,7 @@ class FormField(models.Model):
         ("date", _("Date")),
         ("checkbox", _("Checkbox")),
         ("select", _("Select")),
+        ("radio", _("Radio")),
         ("textarea", _("Textarea")),
     ]
 
@@ -220,7 +254,8 @@ class FormField(models.Model):
         verbose_name=_("Is Required"),
         help_text=_("Indicates whether this field is required."),
     )
-    choices = models.TextField(
+    choices = models.CharField(
+        max_length=255,
         blank=True,
         null=True,
         verbose_name=_("Choices"),
@@ -237,6 +272,13 @@ class FormField(models.Model):
         null=True,
         verbose_name=_("Validation Regex"),
         help_text=_("Regular expression for validating the field input."),
+    )
+    help_text = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        verbose_name=_("Help Text"),
+        help_text=_("Additional information or instructions for the field."),
     )
 
     def __str__(self):

@@ -117,7 +117,13 @@ class Team(models.Model):
             self.slug = slug
         super().save(*args, **kwargs)
 
-
+    def get_limit(self, feature_name):
+        """
+        Get the limit for a specific feature based on the team's plan.
+        """
+        if self.plan:
+            return self.plan.get_feature(f"{feature_name}_limit")
+        return None
 
 
 class TeamMember(models.Model):

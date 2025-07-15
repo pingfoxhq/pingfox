@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Schema Editor - {{ form.name }}{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-between">
+    <h1 class="text-3xl font-semibold text-white mb-2">
+        <span class="w-full">{{ form.name }}</span>
+    </h1>
+    <a href="{% url 'forms:list' %}" class="btn btn-sm">
+        &leftarrow; Back to Forms List
+    </a>
+</div>
+<p class="text-sm text-gray-400 mb-8">
+    {{ form.description }}
+</p>
+{% include 'core/partials/dashboard_tab.html' with active_tab="forms" %}
+<div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-bold text-white">🧬 Schema Editor</h1>
+    <div class="space-x-2">
+        <a href="{% url 'forms:builder' form.slug %}" class="btn btn-sm btn-outline">🔙 Switch to UI Builder</a>
+        <button class="btn btn-primary btn-sm" hx-post="#" hx-trigger="click" hx-include="#schema-editor"
+            hx-target="#save-status" hx-swap="innerHTML">
+            💾 Save Schema
+        </button>
+    </div>
+</div>
+
+<div class="grid grid-cols-2 gap-6" hx-post="{% url 'forms:convert' %}" hx-include="#schema-editor" hx-trigger="load"
+    hx-target="#form-preview" hx-swap="innerHTML">
+
+    <!-- Left: JSON Editor -->
+    <div>
+        <form id="schema-editor" method="post">
+            {% csrf_token %}
+            <label for="schema" class="block text-sm font-medium text-gray-400 mb-1">✏️ Form Schema (JSON)</label>
+            <textarea name="schema" rows="24" class="textarea textarea-bordered w-full text-sm font-mono"
+                hx-post="{% url 'forms:convert' %}" hx-include="#schema-editor" hx-target="#form-preview"
+                hx-swap="innerHTML" hx-trigger="keyup changed delay:500ms"
+                placeholder="Enter your form schema here...">{{ schema|default:"{}" }}</textarea>
+        </form>
+        <div id="save-status" class="text-sm mt-2 text-green-400"></div>
+        <div>
+            <label for="theme" class="block text-sm font-medium text-gray-400 mb-1">🎨 Select Theme</label>
+            <select id="theme" name="theme" class="select select-bordered w-full mb-4">
+                <option value="default">Default</option>
+                <option value="dark">Dark</option>
+                <option value="light">Light</option>
+            </select>
+            <button class="btn btn-secondary btn-sm" hx-post="" hx-target="#theme-status" hx-swap="innerHTML">➕ Add
+                Theme</button>
+            <div id="theme-status" class="text-sm mt-2 text-green-400"></div>
+        </div>
+    </div>
+    <!-- Right: Live Preview -->
+    <div>
+        <div class="flex items-center justify-between mb-2">
+            <h2 class="text-sm font-semibold text-gray-300 uppercase">Live Preview</h2>
+            <button class="btn btn-xs btn-outline" hx-post="{% url 'forms:convert' %}" hx-include="#schema-editor"
+                hx-target="#form-preview" hx-swap="innerHTML">🔁 Refresh Preview</button>
+        </div>
+        <div id="form-preview" class="bg-base-200 rounded-lg p-4 border border-base-300">
+            <p class="text-sm text-gray-500 italic">Submit or refresh to see preview.</p>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

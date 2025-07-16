@@ -6,6 +6,7 @@ from django.utils.html import format_html
 # By default, these features are for the "Free" plan.
 DEFAULT_FEATURES = {
     "is_pro": "false",
+    "sites_limit": "1",
     "pageviews": "10000",
     "forms_enabled": "true",
     "forms_limit": "3",

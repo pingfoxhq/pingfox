@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+
+{% block title %}
+Your Sites
+{% endblock title %}
+
+{% block content %}
+
+<div class="flex items-center justify-between">
+    <h1 class="text-3xl font-semibold text-white mb-2">Your Sites ({{ sites.count }}/{{max_sites}})</h1>
+
+
+    {% if can_create %}
+    <a href="{% url 'sites:create' %}" class="btn btn-primary btn-sm">+ Create New Site</a>
+    {% endif %}
+</div>
+<p class="text-sm text-gray-400 mb-8">
+    Manage all sites created by your team.
+</p>
+
+{% include 'core/partials/dashboard_tab.html' with active_tab="sites" %}
+{% if sites %}
+<div class="grid grid-cols-1 gap-6">
+    {% for site in sites %}
+    <div class="bg-base-200 p-5 rounded-xl border border-base-300 hover:border-primary transition-all duration-200">
+        <div class="flex justify-between items-center mb-2">
+            <div class="flex flex-col">
+                <a href="{% url 'sites:edit' site.site_id %}" class="text-lg font-medium text-white hover:underline">
+                    {{ site.name }}
+                </a>
+                <div class="flex">
+                    <span class="text-xs text-gray-500">/{{ site.site_id }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="flex justify-between text-sm text-gray-400 mt-2">
+            <span>Created: {{ site.created_at|date:"M j, Y" }}
+            </span>
+            <span>
+                {{site.is_verified|yesno:"Verified,Not Verified"}} |
+                {{site.is_active|yesno:"Active,Inactive"}}
+            </span>
+
+
+        </div>
+        <a href="{% url 'sites:edit' site.site_id %}" class="btn">Edit Info</a>
+        {% if site.is_verified %}
+        <span class="badge badge-success btn-xs">Verified</span>
+        {% else %}
+        <!-- Send verification request -->
+        <a href="{% url 'sites:verify' site.site_id %}" class="btn btn-warning btn-xs">Verify</a>
+        {% endif %}
+        <!-- Delete site link -->
+        <a href="{% url 'sites:delete' site.site_id %}" class="btn btn-error btn-xs">Delete</a>
+        {% if site.is_verified %}
+        <!-- accordian spoilor for verification token with alpine js -->
+        <!-- help text -->
+
+
+        <p class="text-xs text-gray-500 mt-2">
+            To verify your site, this token should be placed at <code>~/.well-known/pingfox-verification.txt</code> on
+            your filesystem.
+            <br>
+            This is used to verify ownership of the site.
+        </p>
+        <div x-data="{ open: false }" class="mt-2">
+            <button @click="open = !open" class="btn btn-xs btn-ghost">Show Verification Token</button>
+            <div x-show="open" class="mt-2 p-2 bg-gray-800 rounded" style="display: none;">
+                <code>{{ site.verification_token }}</code>
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p class="text-gray-400">No sites found. Create a new site to get started.</p>
+{% endif %}
+
+{% endblock content %}

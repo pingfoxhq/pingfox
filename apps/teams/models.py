@@ -79,7 +79,10 @@ class Team(models.Model):
             max_allowed = int(self.feature_limit("forms_limit")) or 3
             current_count = self.forms.count()
             return max_allowed is not None and current_count >= max_allowed
-
+        elif resource_type == "sites":
+            max_allowed = int(self.feature_limit("sites_limit")) or 1
+            current_count = self.sites.count()
+            return max_allowed is not None and current_count >= max_allowed
         # You can add more like 'members', 'integrations', etc.
         return False
 

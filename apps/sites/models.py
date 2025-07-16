@@ -2,6 +2,7 @@ import secrets
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 from django.db import models
+from apps.teams.models import Team
 
 
 def generate_site_id():
@@ -18,11 +19,20 @@ def verification_file_path():
         return ".well-known/pingfox-verification.txt"
 
 class Site(models.Model):
-    user = models.ForeignKey(
+    team = models.ForeignKey(
+        Team,
+        on_delete=models.CASCADE,
+        related_name="sites",
+        verbose_name=_("Team"),
+        help_text=_("The team that owns this site."),
+    )
+         
+    owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name="sites",
-        verbose_name=_("User"),
+        verbose_name=_("Owner"),
+        help_text=_("The user who made this site."),
     )
 
     name = models.CharField(

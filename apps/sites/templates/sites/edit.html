@@ -2,14 +2,14 @@
 {% load static %}
 {% load crispy_forms_tags %}
 
-{% block title %}Create Site{% endblock %}
+{% block title %}Edit Site{% endblock %}
 
 {% block content %}
 
 <div class="flex items-center justify-between">
 
     <h1 class="text-3xl font-semibold text-white mb-2">
-        Create a Site
+        Edit a Site
     </h1>
     <a href="{% url 'sites:list' %}" class="btn btn-sm">
         &leftarrow; Back to sites List
@@ -19,5 +19,5 @@
     Create a new site for your team. Fill in the details below.
 </p>
 {% include 'core/partials/dashboard_tab.html' with active_tab="sites" %}
-{% include 'core/partials/create_form.html' with form=form button_text="Create" %}
+{% include 'core/partials/create_form.html' with form=form button_text="Save" %}
 {% endblock content %}

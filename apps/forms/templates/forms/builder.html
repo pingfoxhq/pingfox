@@ -1,13 +1,10 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
 
-{% block title %}
-Create a Form
-{% endblock %}
+{% block title %}UI Builder - {{ form.name }}{% endblock %}
 
 {% block content %}
 <div class="flex items-center justify-between">
-
   <h1 class="text-3xl font-semibold text-white mb-2">
     <span class="w-full">{{ form.name }}</span>
   </h1>
@@ -19,18 +16,276 @@ Create a Form
   {{ form.description }}
 </p>
 {% include 'core/partials/dashboard_tab.html' with active_tab="forms" %}
+<div class="mb-6" x-data="formBuilder('{{ form.slug }}')">
 
-<div class="flex items-center justify-between mb-6">
-  <h1 class="text-2xl font-bold text-white">🛠️ UI Builder</h1>
-  <div class="space-x-2">
-    <a href="{% url 'forms:editor' form.slug %}" class="btn btn-sm btn-outline">🔙 Switch to Schema Builder</a>
-    <button class="btn btn-primary btn-sm" hx-post="#" hx-trigger="click" hx-include="#schema-editor"
-      hx-target="#save-status" hx-swap="innerHTML">
-      💾 Save Schema
-    </button>
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-bold text-white">🛠️ Build Your Form</h1>
+    <div class="space-x-2">
+      <a href="{% url 'forms:editor' form.slug %}" class="btn btn-sm btn-outline">🔙 Switch to Schema Editor</a>
+
+      <button class="btn btn-primary btn-sm" @click="submit()">💾 Save Form</button>
+    </div>
+  </div>
+  <noscript>
+    <div class="alert alert-warning">
+      <strong>Warning!</strong> JavaScript is disabled in your browser. The form builder requires JavaScript to function
+      properly.
+      <br>
+      If you can't enable JavaScript, you can still edit the form schema in the <a
+        href="{% url 'forms:editor' form.slug %}" class="link">Schema Editor</a>.
+    </div>
+  </noscript>
+  <div class="grid grid-cols-12 gap-6">
+
+    <!-- Sidebar -->
+    <div class="col-span-3 bg-base-200 rounded-xl p-4 border border-base-300 space-y-4">
+      <h2 class="text-sm text-gray-400 uppercase font-semibold">Add Field</h2>
+      <p class="helptext text-xs text-gray-500 mb-4">
+        Click a field type below to add it to your form. You can then customize each field's properties.
+      </p>
+      <template x-for="field in fieldTypes" :key="field.type">
+        <button class="btn btn-sm btn-outline w-full justify-start" @click="addField(field)">
+          <span x-text="field.label"></span>
+        </button>
+      </template>
+    </div>
+
+    <!-- Builder Canvas -->
+    <div class="col-span-9 bg-base-200 rounded-xl p-6 border border-base-300 min-h-[500px]">
+      <h2 class="text-md font-semibold text-white mb-4">Form Preview</h2>
+      <template x-if="fields.length === 0">
+        <p class="text-gray-500 italic text-sm">Click a field to add it to your form.</p>
+      </template>
+
+      <div class="space-y-4" x-ref="sortable" x-init="makeSortable()">
+        <template x-for="(field, index) in fields" :key="field._id">
+          <div class="card bg-box-bg border border-gray-700 shadow-sm p-4 flex flex-col gap-2">
+            <div class="flex justify-between items-center">
+              <div class="flex-1">
+                <input type="text" class="input input-sm input-bordered w-full" x-model="field.label">
+                <p class="text-xs text-gray-500 mt-1" x-text="`Type: ${field.type}`"></p>
+              </div>
+              <button class="btn btn-sm btn-error ml-4" @click="removeField(index)">✕</button>
+            </div>
+            <!-- Help text, placeholder, validation -->
+            <!-- Make it collapasable -->
+            <button class="text-xs text-blue-400 underline text-left"
+              @click="field._showAdvanced = !field._showAdvanced">
+              Advanced settings
+            </button>
+            <div x-show="field._showAdvanced" class="mt-2 space-y-1">
+              <div>
+                <div class="text-gray-500 mt-1">
+                  <label class="cursor-pointer">
+                    <input type="text" class="input input-xs input-bordered w-full" x-model="field.helpText"
+                      placeholder="Help text (optional)">
+                  </label>
+                  <label class="cursor-pointer ml-4">
+                    <input type="text" class="input input-xs input-bordered w-full" x-model="field.placeholder"
+                      placeholder="Placeholder (optional)">
+                  </label>
+                  <label class="cursor-pointer">
+                    <input type="text" class="input input-xs input-bordered w-full" x-model="field.validation"
+                      placeholder="Validation (e.g. email)">
+                  </label>
+                  <label class="cursor-pointer ml-4">
+                    <input type="text" class="input input-xs input-bordered w-full" x-model="field.defaultValue"
+                      placeholder="Default Value (optional)">
+                  </label>
+                </div>
+              </div>
+              <div class="text-xs text-gray-500 mt-1">
+                <label class="cursor-pointer">
+                  <input type="checkbox" x-model="field.required" class="checkbox checkbox-xs"> Required
+                </label>
+                <label class="cursor-pointer ml-4">
+                  <input type="checkbox" x-model="field.readonly" class="checkbox checkbox-xs"> Readonly
+                </label>
+              </div>
+              <div class="text-xs text-gray-500 mt-1">
+                <label class="cursor-pointer">
+                  <input type="checkbox" x-model="field.hidden" class="checkbox checkbox-xs"> Hidden
+                </label>
+                <label class="cursor-pointer ml-4">
+                  <input type="checkbox" x-model="field.disabled" class="checkbox checkbox-xs"> Disabled
+                </label>
+              </div>
+            </div>
+            <!-- Conditional Options -->
+            <template x-if="['select', 'radio'].includes(field.type)">
+              <div>
+                <label class="text-sm text-gray-400">Options</label>
+                <template x-for="(opt, optIdx) in field.options" :key="optIdx">
+                  <div class="flex items-center space-x-2 mt-1">
+                    <input type="text" class="input input-xs input-bordered w-full" x-model="field.options[optIdx]">
+                    <button class="btn btn-xs btn-ghost text-error" @click="field.options.splice(optIdx, 1)">✕</button>
+                  </div>
+                </template>
+                <button class="btn btn-xs btn-outline mt-2" @click="field.options.push('New Option')">+ Add
+                  Option</button>
+              </div>
+            </template>
+          </div>
+        </template>
+      </div>
+    </div>
+
+    <!-- Live Preview -->
+    <div class="col-span-12 my-6">
+      <button class="btn btn-sm btn-outline" @click="renderLivePreview()">🔁 Refresh Preview</button>
+      <h2 class="text-md font-semibold text-white my-2">Live Preview</h2>
+      <div class="bg-base-200 rounded-xl p-6 border border-base-300" x-html="livePreviewHtml"></div>
+    </div>
+
   </div>
 </div>
 
-<h4 class="text-lg font-semibold text-white mb-4">:TODO:</h4>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<script>
+  function formBuilder(slug) {
+    return {
+      fieldTypes: [
+        { type: 'text', label: 'Text Input' },
+        { type: 'email', label: 'Email' },
+        { type: 'textarea', label: 'Textarea' },
+        { type: 'select', label: 'Select' },
+        { type: 'checkbox', label: 'Checkbox' },
+        { type: 'radio', label: 'Radio' }
+      ],
+      fields: [],
+      livePreviewHtml: '',
+
+
+      init() {
+        fetch("{% url 'forms:schema' form.slug %}")
+          .then(res => res.json())
+          .then(data => {
+            this.fields = data.map((field, index) => ({
+              _id: Date.now() + Math.random(),
+              name: field.name || field.label.toLowerCase().replace(/\s+/g, '_'),
+              label: field.label || '',
+              type: field.type || 'text',
+              required: field.required || false,
+              readonly: field.readonly || false,
+              hidden: field.hidden || false,
+              disabled: field.disabled || false,
+              helpText: field.helpText || '',
+              placeholder: field.placeholder || '',
+              validation: field.validation || '',
+              defaultValue: field.defaultValue || '',
+              options: field.options || (['select', 'radio'].includes(field.type) ? ['Option 1', 'Option 2'] : null),
+              order: field.order || index
+            }));
+            this.renderLivePreview();
+          })
+          .catch(err => {
+            console.error("Failed to fetch schema:", err);
+          });
+      },
+
+      addField(fieldType) {
+        const baseName = fieldType.label.toLowerCase().replace(/\s+/g, '_');
+        let name = baseName;
+        let counter = 1;
+
+        // Ensure the name is unique
+        while (this.fields.some(f => f.name === name)) {
+          name = `${baseName}_${counter}`;
+          counter++;
+        }
+
+        this.fields.push({
+          _id: Date.now() + Math.random(),
+          name: name,
+          label: fieldType.label,
+          type: fieldType.type,
+          required: false,
+          readonly: false,
+          hidden: false,
+          disabled: false,
+          helpText: '',
+          placeholder: '',
+          validation: '',
+          defaultValue: '',
+          options: ['select', 'radio'].includes(fieldType.type) ? ['Option 1', 'Option 2'] : null,
+          order: this.fields.length
+        });
+        this.renderLivePreview();
+
+      },
+
+      removeField(index) {
+        this.fields.splice(index, 1);
+        this.renderLivePreview();
+
+      },
+
+      makeSortable() {
+        const el = this.$refs.sortable;
+        Sortable.create(el, {
+          animation: 150,
+          onEnd: (evt) => {
+            const movedItem = this.fields.splice(evt.oldIndex, 1)[0];
+            this.fields.splice(evt.newIndex, 0, movedItem);
+          }
+        });
+      },
+
+      submit() {
+        fetch("{% url 'forms:save' form.slug %}", {
+          method: "POST",
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+          },
+          body: JSON.stringify({ fields: this.fields })
+        })
+          .then(res => {
+            if (!res.ok) throw new Error("Failed to save");
+            return res.json();
+          })
+          .then(data => {
+            alert("✅ Form saved successfully!");
+          })
+          .catch(err => {
+            alert("❌ Error saving form.");
+            console.error(err);
+          });
+      },
+      renderLivePreview() {
+
+        const formData = new FormData();
+        formData.append('schema', JSON.stringify(this.fields));
+
+        fetch("{% url 'forms:convert' %}", {
+          method: "POST",
+          headers: {
+            'X-CSRFToken': '{{ csrf_token }}'
+          },
+          body: formData
+        })
+          .then(res => {
+            if (!res.ok) throw new Error("Conversion failed");
+            return res.text();
+          })
+          .then(html => {
+            this.livePreviewHtml = html;
+          })
+          .catch(err => {
+            console.error("Preview error:", err);
+            if (this.fields.length === 0) {
+              this.livePreviewHtml = "<p class='text-gray-500 text-sm'>No fields added yet. Click a field type to add it.</p>";
+              return;
+            }
+            this.livePreviewHtml = "<p class='text-red-500 text-sm'>Failed to render preview.</p>";
+          });
+      }
+    };
+  }
+
+
+
+
+</script>
 
 {% endblock content %}

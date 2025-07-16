@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% load get_item %}
+
+{% block title %}Submissions - {{ form.name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto mt-10 bg-base-200 border border-base-300 rounded-xl p-6 shadow">
+  <h1 class="text-2xl font-bold text-white mb-2">
+    📊 Submissions for {{ form.name }}
+  </h1>
+  <p class="text-sm text-gray-400 mb-6">
+    Total submissions: {{ submissions|length }}
+  </p>
+
+  {% if submissions %}
+    <div class="overflow-x-auto">
+      <table class="table w-full table-zebra">
+        <thead>
+          <tr>
+            <th class="text-left text-gray-400">Submitted At</th>
+            {% for field in field_labels %}
+              <th class="text-left text-gray-400">{{ field }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for submission in submissions %}
+            <tr>
+              <td class="text-white text-sm whitespace-nowrap">{{ submission.submitted_at|date:"Y-m-d H:i" }}</td>
+              {% for field in field_labels %}
+                <td class="text-white text-sm">
+                  {% with submission.data|get_item:field as value %}
+                    {% if value is list %}
+                      {{ value|join:", " }}
+                    {% elif value is boolean %}
+                      {{ value|yesno:"Yes,No" }}
+                    {% else %}
+                      {{ value|default:"—" }}
+                    {% endif %}
+                  {% endwith %}
+                </td>
+              {% endfor %}
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="text-gray-500 italic">No submissions yet.</p>
+  {% endif %}
+
+  <div class="mt-6">
+    <a href="{% url 'forms:list' %}" class="btn btn-outline btn-sm">&larr; Back to Forms</a>
+  </div>
+</div>
+{% endblock %}

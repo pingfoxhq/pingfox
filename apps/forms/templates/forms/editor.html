@@ -19,10 +19,11 @@
     <h1 class="text-2xl font-bold text-white">🧬 Schema Editor</h1>
     <div class="space-x-2">
         <a href="{% url 'forms:builder' form.slug %}" class="btn btn-sm btn-outline">🔙 Switch to UI Builder</a>
-        <button class="btn btn-primary btn-sm" hx-post="#" hx-trigger="click" hx-include="#schema-editor"
-            hx-target="#save-status" hx-swap="innerHTML">
+        <button class="btn btn-primary btn-sm" hx-post="{% url 'forms:save_htmx' form.slug %}" hx-trigger="click"
+            hx-include="#schema-editor" hx-target="#save-status" hx-swap="innerHTML">
             💾 Save Schema
         </button>
+
     </div>
 </div>
 

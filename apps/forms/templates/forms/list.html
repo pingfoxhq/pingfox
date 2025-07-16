@@ -20,7 +20,17 @@
                 <a href="{% url 'forms:builder' form.slug %}" class="text-lg font-medium text-white hover:underline">
                     {{ form.name }}
                 </a>
-                <span class="text-xs text-gray-500">/{{ form.slug }}</span>
+                <div class="flex">
+                    <a href="{% url 'public_forms:public' form.slug %}" hx-boost="false">
+                        <span class="text-xs text-gray-500">/{{ form.slug }}</span>
+                    </a>
+                    <!-- Copy public form URL to clipboard -->
+                    <button class="btn btn-xs btn-ghost ml-2"
+                        x-on:click="navigator.clipboard.writeText('{{ request.build_absolute_uri }}{{ form.get_absolute_url }}')">
+                        📋
+                    </button>
+
+                </div>
             </div>
             {% if form.is_active %}
             <span class="badge badge-success text-xs">Active</span>
@@ -30,9 +40,20 @@
         </div>
         <div class="flex justify-between text-sm text-gray-400 mt-2">
             <span>Created: {{ form.created_at|date:"M j, Y" }}</span>
-            <span>{{ form.submissions.count|default:"0" }} Submissions</span>
+            <span>
+                <a href="{% url 'forms:submission_list' form.slug %}">
+
+                    {{ form.submissions.count|default:"0" }} Submissions
+                </a>
+            </span>
         </div>
         <a href="{% url 'forms:edit' form.slug %}" class="btn">Edit Info</a>
+
+        {% if form.is_locked %}
+        <span class="badge badge-warning btn-xs">Frozen</span>
+        {% else %}
+        <a href="{% url 'forms:freeze' form.slug %}" class="btn btn-error btn-xs">Freeze</a>
+        {% endif %}
     </div>
     {% endfor %}
 </div>

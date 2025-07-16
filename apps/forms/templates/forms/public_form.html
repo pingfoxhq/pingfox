@@ -1,0 +1,14 @@
+{% extends "forms/base_public.html" %}
+
+{% block title %}{{ form_obj.name }}{% endblock %}
+
+{% block content %}
+<h1>{{ form_obj.name }}</h1>
+<p>{{ form_obj.description }}</p>
+
+<form method="post" action="{% url 'public_forms:submit' form_obj.slug %}">
+  {% csrf_token %}
+  {{ form }}
+  <button class="btn btn-primary w-full" type="submit">Submit</button>
+</form>
+{% endblock %}

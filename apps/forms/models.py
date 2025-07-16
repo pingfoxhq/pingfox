@@ -7,6 +7,7 @@ from colorfield.fields import ColorField
 from apps.teams.models import Team
 from django.utils.text import slugify
 from django.core.exceptions import ValidationError
+from apps.analytics.models import VisitorSession
 
 User = get_user_model()
 
@@ -95,6 +96,36 @@ class Form(models.Model):
         help_text=_("A unique key required for authenticated form submissions."),
     )
 
+    redirect_url = models.URLField(
+        blank=True,
+        null=True,
+        verbose_name=_("Redirect URL"),
+        help_text=_("URL to redirect users after form submission."),
+    )
+    allow_anonymous_submissions = models.BooleanField(
+        default=False,
+        verbose_name=_("Allow Anonymous Submissions"),
+        help_text=_(
+            "Indicates whether the form can be submitted by users who are not authenticated."
+        ),
+    )
+    allow_multiple_submissions = models.BooleanField(
+        default=False,
+        verbose_name=_("Allow Multiple Submissions"),
+        help_text=_(
+            "Indicates whether users can submit this form multiple times."
+        ),
+    )
+    # This field is used to track visitors who have interacted with the form
+    # It can be used for analytics or to prevent spam submissions also for preventing multiple submissions
+    visitors = models.ManyToManyField(
+        VisitorSession,
+        blank=True,
+        related_name="forms",
+        verbose_name=_("Visitors"),
+        help_text=_("Visitors who have interacted with this form."),
+    )
+
     is_locked = models.BooleanField(
         default=False,
         verbose_name=_("Is Locked"),
@@ -103,6 +134,12 @@ class Form(models.Model):
 
     def __str__(self):
         return self.name
+
+    def get_absolute_url(self):
+        """
+        Returns the absolute URL for the form.
+        """
+        return f"/f/{self.slug}/"
 
     class Meta:
         verbose_name = _("Form")
@@ -130,14 +167,6 @@ class Form(models.Model):
             
         super().save(*args, **kwargs)
 
-    def clean(self):
-        """
-        Custom validation to ensure the owner is a member of the team.
-        """
-        if not self.owner in self.team.members.all():
-            raise ValidationError(
-                _("The owner must be a member of the team.")
-            )
 
 
 class FormStyle(models.Model):
@@ -198,6 +227,7 @@ class FormStyle(models.Model):
         verbose_name=_("Custom CSS"),
         help_text=_("Custom CSS styles for the form."),
     )
+    
 
     def __str__(self):
         return f"Style for {self.form.name}"
@@ -227,7 +257,7 @@ class FormField(models.Model):
         help_text=_("The form to which this field belongs."),
     )
     label = models.CharField(
-        max_length=255,
+        max_length=1024,
         verbose_name=_("Field Label"),
         help_text=_("The label for the form field."),
     )
@@ -238,12 +268,12 @@ class FormField(models.Model):
         help_text=_("The type of the form field."),
     )
     name = models.SlugField(
-        max_length=255,
+        max_length=1024,
         verbose_name=_("Field Name"),
         help_text=_("A unique identifier for the field, used in form submissions."),
     )
     placeholder = models.CharField(
-        max_length=255,
+        max_length=1024,
         blank=True,
         null=True,
         verbose_name=_("Placeholder"),
@@ -254,8 +284,23 @@ class FormField(models.Model):
         verbose_name=_("Is Required"),
         help_text=_("Indicates whether this field is required."),
     )
+    readonly = models.BooleanField(
+        default=False,
+        verbose_name=_("Is Readonly"),
+        help_text=_("Indicates whether this field is readonly."),
+    )
+    hidden = models.BooleanField(
+        default=False,
+        verbose_name=_("Is Hidden"),
+        help_text=_("Indicates whether this field is hidden from the user."),
+    )
+    disabled = models.BooleanField(
+        default=False,
+        verbose_name=_("Is Disabled"),
+        help_text=_("Indicates whether this field is disabled."),
+    )
     choices = models.CharField(
-        max_length=255,
+        max_length=2048,
         blank=True,
         null=True,
         verbose_name=_("Choices"),
@@ -267,18 +312,24 @@ class FormField(models.Model):
         help_text=_("The order of the field in the form."),
     )
     validation_regex = models.CharField(
-        max_length=255,
+        max_length=1024,
         blank=True,
         null=True,
         verbose_name=_("Validation Regex"),
         help_text=_("Regular expression for validating the field input."),
     )
     help_text = models.CharField(
-        max_length=255,
+        max_length=1024,
         blank=True,
         null=True,
         verbose_name=_("Help Text"),
         help_text=_("Additional information or instructions for the field."),
+    )
+    default_value = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name=_("Default Value"),
+        help_text=_("The default value for the field, if applicable."),
     )
 
     def __str__(self):

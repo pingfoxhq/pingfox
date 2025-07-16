@@ -1,0 +1,11 @@
+{% extends "forms/base_public.html" %}
+
+
+{% block title %}Thank You{% endblock %}
+
+{% block content %}
+<div class="max-w-xl mx-auto mt-20 text-center">
+  <h1 class="text-2xl font-bold text-green-400">🎉 Submission Received!</h1>
+  <p class="mt-4 text-gray-500">Thanks for submitting the form <strong>{{ form_obj.name }}</strong>.</p>
+</div>
+{% endblock %}

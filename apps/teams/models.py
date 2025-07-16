@@ -76,7 +76,7 @@ class Team(models.Model):
         from apps.forms.models import Form  # adjust import to avoid circular
 
         if resource_type == "forms":
-            max_allowed = self.feature_limit("forms_limit")
+            max_allowed = int(self.feature_limit("forms_limit")) or 3
             current_count = self.forms.count()
             return max_allowed is not None and current_count >= max_allowed
 

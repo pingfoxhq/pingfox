@@ -1,13 +1,26 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from .forms import SiteCreationForm
+import json
 from django.contrib.auth.decorators import login_required
-from .models import Site
-from django.contrib import messages
-from apps.analytics.models import VisitorSession, PageView
 from django.core.paginator import Paginator
-from django.db.models import Count
+from django.shortcuts import get_object_or_404, render
+from apps.sites.models import Site
+from apps.sites.services.analytics import (
+    get_top_pages,
+    get_top_referrers,
+    get_pageviews_by_day,
+    get_visitors,
+    get_page_views,
+)
+from django.shortcuts import render, redirect, get_object_or_404
+from apps.sites.forms import SiteCreationForm
+from django.contrib.auth.decorators import login_required
+from apps.sites.models import Site
+from django.contrib import messages
+from apps.analytics.models import PageView
+from django.core.paginator import Paginator
 from apps.teams.utils import get_current_team
-from .tasks import verify_site
+import json
+from apps.sites.tasks import verify_site
+
 
 
 @login_required
@@ -68,6 +81,16 @@ def edit_site(request, site_id):
 
 
 @login_required
+def delete_site(request, site_id):
+    site = get_object_or_404(Site, site_id=site_id, owner=request.user)
+    if request.method == "POST":
+        site.delete()
+        messages.success(request, "Site deleted successfully.")
+        return redirect("sites:list")
+    return render(request, "sites/delete.html", {"site": site})
+
+
+@login_required
 def send_verification(request, site_id):
     site = get_object_or_404(Site, site_id=site_id, owner=request.user)
     if not site.is_verified:
@@ -79,47 +102,22 @@ def send_verification(request, site_id):
 
 
 @login_required
-def delete_site(request, site_id):
-    site = get_object_or_404(Site, site_id=site_id, owner=request.user)
-    if request.method == "POST":
-        site.delete()
-        messages.success(request, "Site deleted successfully.")
-        return redirect("sites:list")
-    return render(request, "sites/delete.html", {"site": site})
-
-
-@login_required
 def site_details(request, site_id):
     site = get_object_or_404(Site, site_id=site_id, owner=request.user)
 
-    visitors = VisitorSession.objects.filter(page_views__site=site).distinct()
-
-    page_views = PageView.objects.filter(site=site).order_by("-timestamp")
-
-    # Pagination for page views
+    # Pagination
     per_page = request.GET.get("per_page", 10)
-    if str(per_page).isdigit():
-        per_page = int(per_page)
-    else:
-        per_page = 10
-    paginator = Paginator(page_views, per_page)  # Show per_page page views per page
-
-    top_pages = (
-        PageView.objects.filter(site=site)
-        .values("url")
-        .annotate(view_count=Count("id"))
-        .order_by("-view_count")[:5]
-    )
-
-    top_referrers = (
-        PageView.objects.filter(site=site)
-        .exclude(referrer__isnull=True)
-        .exclude(referrer__exact="")
-        .values("referrer")
-        .annotate(count=Count("id"))
-        .order_by("-count")[:5]
-    )
+    per_page = int(per_page) if str(per_page).isdigit() else 10
     page_number = request.GET.get("page")
+
+    # Data fetching
+    visitors = get_visitors(site)
+    page_views_qs = get_page_views(site)
+    top_pages = get_top_pages(site)
+    top_referrers = get_top_referrers(site)
+    chart_labels, chart_data = get_pageviews_by_day(site)
+
+    paginator = Paginator(page_views_qs, per_page)
     page_obj = paginator.get_page(page_number)
 
     context = {
@@ -132,9 +130,7 @@ def site_details(request, site_id):
         "page_number": page_number,
         "paginator": paginator,
         "page_obj": page_obj,
-        "visitor_count": visitors.count(),
-        "page_view_count": page_views.count(),
-        "top_referrer_count": top_referrers.count(),
-        "top_page_count": top_pages.count(),
+        "chart_labels": json.dumps(chart_labels),
+        "chart_data": json.dumps(chart_data),
     }
     return render(request, "sites/details.html", context)

@@ -81,6 +81,18 @@ class Form(models.Model):
         verbose_name=_("Is Active"),
         help_text=_("Indicates whether the form is currently active."),
     )
+    allow_analytics = models.BooleanField(
+        default=True,
+        verbose_name=_("Allow Analytics"),
+        help_text=_("Indicates whether analytics are enabled for this form."),
+    )
+    site_id = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        verbose_name=_("Site ID"),
+        help_text=_("The ID of the site where this form is hosted, entered if analytics are enabled."),
+    )
     authentication_required = models.BooleanField(
         default=False,
         verbose_name=_("Authentication Required"),

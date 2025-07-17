@@ -48,6 +48,11 @@ class Site(models.Model):
             "The domain name for this site (e.g. 'example.com' - no protocol)."
         ),
     )
+    url = models.URLField(
+        max_length=255,
+        verbose_name=_("URL"),
+        help_text=_("The full URL for this site (e.g. 'https://example.com')."),
+    )
     site_id = models.CharField(
         max_length=24,
         unique=True,

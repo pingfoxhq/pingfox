@@ -1,0 +1,124 @@
+{% load static %}
+
+<div class="mb-6">
+    <h3 class="text-xl font-semibold text-white mb-4">Site Traffic Chart</h3>
+
+    <!-- Tabs -->
+    <div class="flex gap-2 mb-4">
+        <button data-range="daily"
+            class="tab-btn bg-gray-800 text-white px-3 py-1 rounded hover:bg-gray-700">Daily</button>
+        <button data-range="hourly"
+            class="tab-btn bg-gray-800 text-white px-3 py-1 rounded hover:bg-gray-700">Hourly</button>
+        <button data-range="minute" class="tab-btn bg-gray-800 text-white px-3 py-1 rounded hover:bg-gray-700">Per
+            Minute</button>
+    </div>
+
+    <!-- Chart container -->
+    <div class="bg-gray-900 p-4 rounded-lg shadow-lg">
+        <canvas id="siteChart" height="150"></canvas>
+    </div>
+</div>
+<script src="{% static 'chart.js' %}"></script>
+<script>
+    const site_id = "{{ site.site_id }}";
+    const ctx = document.getElementById("siteChart").getContext("2d");
+    let chartInstance = null;
+    let range = localStorage.getItem('chartRange') || 'daily';
+
+    const fetchChartData = async (range) => {
+        const res = await fetch(`/api/sites/${site_id}/chart-data/?range=${range}`, {
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json'
+            }
+        });
+        const json = await res.json();
+
+        // Transform the flat array into chart.js-friendly shape
+        const label = json.map(item => item.label);
+        const data = json.map(item => item.count);
+
+        return { label, data };
+    };
+
+
+    const renderChart = (range) => {
+        fetchChartData(range).then(result => {
+            if (!result) {
+                console.warn(`No data returned for range: ${range}`);
+                return;
+            }
+
+            const { label, data } = result;
+
+            if (chartInstance) chartInstance.destroy();
+
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: label,  // 🛠️ This was `label` instead of `labels` before
+                    datasets: [{
+                        label: `${range.charAt(0).toUpperCase() + range.slice(1)} Views`,
+                        data: data,
+                        fill: true,
+                        backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                        borderColor: 'rgba(59, 130, 246, 1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { color: '#ccc' },
+                            grid: { color: '#333' }
+                        },
+                        x: {
+                            ticks: { color: '#ccc' },
+                            grid: { color: '#333' }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: { color: '#eee' } // 🛠️ corrected `label` to `labels`
+                        }
+                    }
+                }
+            });
+        });
+    };
+
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const range = btn.dataset.range;
+            localStorage.setItem('chartRange', range);
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('bg-gray-700'));
+            btn.classList.add('bg-gray-700');
+            
+            renderChart(range);
+        });
+    });
+    document.addEventListener("htmx:afterSettle", (event) => {
+        // Update the chart when the page is loaded or htmx updates the content
+        const currentRange = localStorage.getItem('chartRange') || 'daily';
+        document.querySelector(`.tab-btn[data-range="${currentRange}"]`).classList.add('bg-gray-700');
+        renderChart(currentRange);
+    });
+    // Default render
+    renderChart(range);
+
+    // Simple polling mechanism
+    setInterval(() => {
+        const currentRange = localStorage.getItem('chartRange') || 'daily';
+        fetchChartData(currentRange).then(result => {
+            if (result) {
+                const { label, data } = result;
+                chartInstance.data.labels = label;
+                chartInstance.data.datasets[0].data = data;
+                chartInstance.update();
+            }
+        });
+    }, 60000); // Update every minute
+</script>

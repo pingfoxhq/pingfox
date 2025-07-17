@@ -1,0 +1,43 @@
+{% if page_views.has_other_pages %}
+<tr>
+    <td colspan="4" class="py-2 px-3 text-center">
+        <div class="flex justify-center space-x-2 items-center">
+            {% if page_views.has_previous %}
+            <a href="?page={{ page_views.previous_page_number }}&per_page={{ page_views.paginator.per_page }}"
+                class="btn btn-sm btn-outline">←
+                Previous</a>
+            {% endif %}
+            <span>Page {{ page_views.number }} of {{ page_views.paginator.num_pages }}</span>
+            {% if page_views.has_next %}
+            <a href="?page={{ page_views.next_page_number }}&per_page={{ page_views.paginator.per_page }}"
+                class="btn btn-sm btn-outline">Next →</a>
+            {% endif %}
+
+        </div>
+    </td>
+</tr>
+<!-- Go to input -->
+<tr>
+    <td colspan="6" class="py-2 px-3 text-center">
+        <form method="get" class="inline-block">
+            <!-- Per page -->
+            <span class="text-sm text-gray-500">Show
+                <select name="per_page" class="select select-bordered w-24"
+                    onchange="location.href='?page={{ page_views.number }}&per_page=' + this.value;">
+                    <option value="10" {% if page_views.paginator.per_page == 10 %}selected{% endif %}>10
+                    </option>
+                    <option value="25" {% if page_views.paginator.per_page == 25 %}selected{% endif %}>25
+                    </option>
+                    <option value="50" {% if page_views.paginator.per_page == 50 %}selected{% endif %}>50
+                    </option>
+                    <option value="100" {% if page_views.paginator.per_page == 100 %}selected{% endif %}>
+                        100</option>
+                </select>
+            </span>
+            <input type="number" name="page" min="1" max="{{ page_views.paginator.num_pages }}"
+                class="input input-bordered w-32 text-center" placeholder="Go to page">
+            <button type="submit" class="btn btn-sm btn-primary ml-2">Go</button>
+        </form>
+    </td>
+</tr>
+{% endif %}

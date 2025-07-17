@@ -19,6 +19,7 @@ class PingFoxFormCreatationForm(forms.ModelForm):
             "auth_key",
             "is_active",
             "allow_multiple_submissions",
+            "allow_analytics",
             "button_text",
         ]
 

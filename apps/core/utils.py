@@ -13,3 +13,15 @@ def get_or_null(model, **kwargs):
         return model.objects.get(**kwargs)
     except model.DoesNotExist:
         return None
+    
+
+
+def cors_enabled(func):
+    def wrapper(*args, **kwargs):
+        response = func(*args, **kwargs)
+        response["Access-Control-Allow-Origin"] = "*"
+        response["Access-Control-Allow-Methods"] = "POST, GET, OPTIONS"
+        response["Access-Control-Allow-Headers"] = "Content-Type"
+        return response
+
+    return wrapper

@@ -1,8 +1,6 @@
 # PingFox
 
-Reqirements for running PingFox.
-
- - docker
- - docker-compose
- - make
- 
+How to run via Procfile:
+```bash
+honcho start -f Procfile.dev
+```

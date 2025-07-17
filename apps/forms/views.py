@@ -95,8 +95,8 @@ def form_delete(request, slug):
         form.delete()
         messages.success(request, "Form deleted successfully.")
         return redirect("forms:list")
-
-    return render(request, "forms/delete.html", {"form": form})
+    form_class = create_form_from_form_model(form)
+    return render(request, "forms/delete.html", {"form": form_class })
 
 
 @login_required

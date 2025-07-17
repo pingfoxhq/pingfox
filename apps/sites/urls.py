@@ -9,5 +9,6 @@ urlpatterns = [
     path("create/", views.create_site, name="create"),
     path("edit/<str:site_id>/", views.edit_site, name="edit"),
     path("delete/<str:site_id>/", views.delete_site, name="delete"),
+    path("details/<str:site_id>/", views.site_details, name="details"),
     path("verify/<str:site_id>/", views.send_verification, name="verify"),
 ]

@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 
 from django.contrib.auth.decorators import login_required
-from .forms import PingFoxFormCreatationForm, DynamicFormSchemaForm
+from .forms import PingFoxFormCreatationForm, DynamicFormSchemaForm, FormStyleForm
 from django.contrib import messages
 from .models import Form, FormSubmission
 from django.views.decorators.http import require_POST
@@ -73,16 +73,30 @@ def form_edit(request, slug):
     team = get_current_team(request)
     form = get_object_or_404(team.forms, slug=slug, owner=request.user)
 
-    if request.method == "POST":
-        form_form = PingFoxFormCreatationForm(request.POST, instance=form)
-        if form_form.is_valid():
-            form_form.save()
-            messages.success(request, "Form updated successfully.")
-            return redirect("forms:builder", slug=form.slug)
-    else:
-        form_form = PingFoxFormCreatationForm(instance=form)
+    form_form = PingFoxFormCreatationForm(request.POST or None, instance=form)
+    style_form = FormStyleForm(request.POST or None, instance=form.style)
+    if request.method == "POST" and form_form.is_valid():
+        form_form.save()
+        messages.success(request, "Form updated successfully.")
+        return redirect("forms:list")
 
-    return render(request, "forms/edit.html", {"form": form_form})
+    return render(request, "forms/edit.html", {"form": form_form, "style_form": style_form, "form_obj": form})
+
+
+@login_required
+def form_delete(request, slug):
+    """
+    Handle the deletion of a form.
+    """
+    team = get_current_team(request)
+    form = get_object_or_404(team.forms, slug=slug, owner=request.user)
+
+    if request.method == "POST":
+        form.delete()
+        messages.success(request, "Form deleted successfully.")
+        return redirect("forms:list")
+
+    return render(request, "forms/delete.html", {"form": form})
 
 
 @login_required
@@ -175,10 +189,14 @@ def save_form(request, slug):
                 field_type=field.get("type", "text"),
                 choices=",".join(field["options"]) if field.get("options") else "",
                 validation_regex=field.get("validation", ""),
-                help_text=field.get("helpText", ""),
+                help_text=field.get("help_text", ""),
                 order=field.get("order", 0),
-                name=field.get("name", "").strip()
-                or field["label"].lower().replace(" ", "_"),
+                name=field.get("name", "").strip(),
+                placeholder=field.get("placeholder", field["label"]),
+                hidden=field.get("hidden", False),
+                disabled=field.get("disabled", False),
+                readonly=field.get("readonly", False),
+                default_value=field.get("default_value", ""),
             )
 
         return JsonResponse({"status": "success"})
@@ -212,7 +230,13 @@ def save_form_schema_view(request, slug):
                 field_type=field["type"],
                 choices=",".join(field["options"]) if field.get("options") else "",
                 validation_regex=field.get("validation", ""),
-                help_text=field.get("helpText", ""),
+                help_text=field.get("help_text", ""),
+                name=field.get("name", "").strip(),
+                placeholder=field.get("placeholder", field["label"]),
+                hidden=field.get("hidden", False),
+                disabled=field.get("disabled", False),
+                readonly=field.get("readonly", False),
+                default_value=field.get("default_value", ""),
             )
         return HttpResponse("✅ Schema saved successfully.")
     except Exception as e:
@@ -316,3 +340,24 @@ def submission_table_view(request, slug):
         "submissions": submissions,
         "field_labels": field_labels,
     })
+
+
+@login_required
+def style_update(request, slug):
+    """
+    Update the form style.
+    """
+    team = get_current_team(request)
+    form = get_object_or_404(team.forms, slug=slug, owner=request.user)
+
+    style_form = FormStyleForm(request.POST, request.FILES or None, instance=form.style)
+    if request.method == "POST" and style_form.is_valid():
+        style_form.save()
+        messages.success(request, "Form style updated successfully.")
+        return redirect("forms:edit", slug=slug)
+    # Just redirect the edit page with the style form
+    messages.error(request, "Failed to update form style. Please check the form.")
+    if not style_form.errors:
+        messages.error(request, "No changes were made to the style.")
+    # Redirect to the edit page with the form and style form
+    return redirect("forms:edit", slug=slug)

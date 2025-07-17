@@ -2,13 +2,98 @@
 
 {% block title %}{{ form_obj.name }}{% endblock %}
 
-{% block content %}
-<h1>{{ form_obj.name }}</h1>
-<p>{{ form_obj.description }}</p>
+{% block style %}
+{% if form_obj.style.font_family == 'inter' %}
+  <link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet">
+{% elif form_obj.style.font_family == 'dyslexic' %}
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/open-dyslexic@0.0.1/open-dyslexic.min.css">
+{% elif form_obj.style.font_family == 'serif' %}
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin&display=swap" rel="stylesheet">
+{% elif form_obj.style.font_family == 'mono' %}
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
+{% elif form_obj.style.font_family == 'sans-serif' %}
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+{% else %}
+  <link href="https://fonts.googleapis.com/css2?family=Arial&display=swap" rel="stylesheet">
+{% endif %}
 
-<form method="post" action="{% url 'public_forms:submit' form_obj.slug %}">
-  {% csrf_token %}
-  {{ form }}
-  <button class="btn btn-primary w-full" type="submit">Submit</button>
-</form>
+<style>
+  :root {
+    --bg-color: {{ form_obj.style.background_color }};
+    --text-color: {{ form_obj.style.text_color }};
+    --accent-color: {{ form_obj.style.accent_color }};
+    --button-color: {{ form_obj.style.button_color }};
+    --button-text-color: {{ form_obj.style.button_text_color }};
+
+    {% if form_obj.style.font_family == 'inter' %}
+      --font-family: 'Inter', sans-serif;
+    {% elif form_obj.style.font_family == 'dyslexic' %}
+      --font-family: 'OpenDyslexic', sans-serif;
+    {% elif form_obj.style.font_family == 'serif' %}
+      --font-family: serif;
+    {% elif form_obj.style.font_family == 'mono' %}
+      --font-family: monospace;
+    {% elif form_obj.style.font_family == 'sans-serif' %}
+      --font-family: sans-serif;
+    {% else %}
+      --font-family: system-ui, sans-serif;
+    {% endif %}
+  }
+</style>
+
+<style>
+  body {
+    background-color: {{ form_obj.style.background_color }};
+    color: {{ form_obj.style.text_color }};
+    font-family: {{ form_obj.style.get_font_family_display|default:"Arial, sans-serif" }};
+  }
+
+  .button {
+    background-color: {{ form_obj.style.button_color }};
+    color: {{ form_obj.style.button_text_color }};
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    font-weight: 600;
+  }
+
+  .button:hover {
+    opacity: 0.9;
+  }
+
+  a {
+    color: {{ form_obj.style.accent_color }};
+  }
+
+  input:focus, textarea:focus, select:focus {
+    border-color: {{ form_obj.style.accent_color }};
+    outline-color: {{ form_obj.style.accent_color }};
+    color: {{ form_obj.style.text_color }};
+  }
+
+  {{ form_obj.style.custom_css|safe }}
+</style>
+{% endblock style %}
+
+
+{% block content %}
+<main class="container">
+  
+  {% if form_obj.style.logo %}
+    <div class="logo">
+      <img src="{{ form_obj.style.logo.url }}" alt="Logo">
+    </div>
+  {% endif %}
+
+  <h1>{{ form_obj.name }}</h1>
+  <p>{{ form_obj.description }}</p>
+
+  <form method="post" action="{% url 'public_forms:submit' form_obj.slug %}">
+    {% csrf_token %}
+    {{ form }}
+    <button class="button" type="submit">{{ form_obj.button_text }}</button>
+  </form>
+
+</main>
 {% endblock %}

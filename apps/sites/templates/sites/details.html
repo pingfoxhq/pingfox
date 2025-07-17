@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Site Details – {{ site.name }}
+{% endblock title %}
+
+{% block content %}
+
+<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6">
+    <div>
+        <h1 class="text-3xl font-bold text-white">{{ site.name }}</h1>
+        <p class="text-sm text-gray-400 mt-1">
+            Site ID: <span class="text-white font-mono">{{ site.site_id }}</span>
+        </p>
+    </div>
+
+    <a href="{% url 'sites:list' %}" class="btn btn-sm btn-outline mt-4 sm:mt-0">
+        ← Back to Sites List
+    </a>
+</div>
+
+{% include 'core/partials/dashboard_tab.html' with active_tab="sites" %}
+<div class="container mx-auto py-6">
+    <h1 class="text-3xl font-bold mb-6 text-white">{{ site.name }} Analytics</h1>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+        <div class="bg-gray-900 p-6 rounded-xl shadow">
+            <h2 class="text-white text-lg mb-2">Total Visitors</h2>
+            <p class="text-3xl font-bold text-green-400">{{ visitor_count }}</p>
+        </div>
+        <div class="bg-gray-900 p-6 rounded-xl shadow">
+            <h2 class="text-white text-lg mb-2">Recent Page Views</h2>
+            <p class="text-xl text-gray-400">{{ page_views|length }}</p>
+        </div>
+    </div>
+
+    <div class="mb-6">
+        <h3 class="text-xl font-semibold text-white mb-2">Top Pages</h3>
+        <ul class="list-disc ml-6 text-gray-300">
+            {% for page in top_pages %}
+            <li>{{ page.url }} — {{ page.view_count }} views</li>
+            {% empty %}
+            <li>No data.</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="mb-6">
+        <h3 class="text-xl font-semibold text-white mb-2">Top Referrers</h3>
+        <ul class="list-disc ml-6 text-gray-300">
+            {% for ref in top_referrers %}
+            <li>{{ ref.referrer }} — {{ ref.count }} hits</li>
+            {% empty %}
+            <li>No referrer data.</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div>
+        <h3 class="text-xl font-semibold text-white mb-4">Recent Views</h3>
+        <table class="w-full text-left text-sm text-gray-400">
+            <thead>
+                <tr class="bg-gray-800 text-gray-500">
+                    <th class="py-2 px-3">Time</th>
+                    <th class="py-2 px-3">Visitor</th>
+                    <th class="py-2 px-3">URL</th>
+                    <th class="py-2 px-3">Referrer</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for view in page_views %}
+                <tr class="border-t border-gray-700 hover:bg-gray-800">
+                    <td class="py-2 px-3">{{ view.timestamp|date:"H:i:s" }}</td>
+                    <td class="py-2 px-3 font-mono text-green-400">{{ view.visitor.pf_id|truncatechars:10 }}</td>
+                    <td class="py-2 px-3">{{ view.url }}</td>
+                    <td class="py-2 px-3">{{ view.referrer|default:"—" }}</td>
+                </tr>
+                {% endfor %}
+                <br>
+                <!-- Paginator -->
+                {% if page_views.has_other_pages %}
+                <tr>
+                    <td colspan="4" class="py-2 px-3 text-center">
+                        <div class="flex justify-center space-x-2">
+                            {% if page_views.has_previous %}
+                            <a href="?page={{ page_views.previous_page_number }}" class="btn btn-sm btn-outline">←
+                                Previous</a>
+                            {% endif %}
+                            <span>Page {{ page_views.number }} of {{ page_views.paginator.num_pages }}</span>
+                            {% if page_views.has_next %}
+                            <a href="?page={{ page_views.next_page_number }}" class="btn btn-sm btn-outline">Next →</a>
+                            {% endif %}
+                            <!-- Per page -->
+                            <span class="text-sm text-gray-500">Show
+                                <select name="per_page" class="select select-bordered w-24"
+                                    onchange="location.href='?page=1&per_page=' + this.value;">
+                                    <option value="10" {% if page_views.paginator.per_page==10 %}selected{% endif %}>10
+                                    </option>
+                                    <option value="25" {% if page_views.paginator.per_page==25 %}selected{% endif %}>25
+                                    </option>
+                                    <option value="50" {% if page_views.paginator.per_page==50 %}selected{% endif %}>50
+                                    </option>
+                                    <option value="100" {% if page_views.paginator.per_page==100 %}selected{% endif %}>
+                                        100</option>
+                                </select>
+                            </span>
+                        </div>
+                    </td>
+                </tr>
+                <!-- Go to input -->
+                <tr>
+                    <td colspan="6" class="py-2 px-3 text-center">
+                        <form method="get" class="inline-block">
+                            <input type="number" name="page" min="1" max="{{ page_views.paginator.num_pages }}"
+                                class="input input-bordered w-32 text-center" placeholder="Go to page">
+                            <button type="submit" class="btn btn-sm btn-primary ml-2">Go</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+<!-- Analytics Script Snippet -->
+<div class="card bg-base-200 shadow-md mt-6">
+    <div class="card-body">
+        <h2 class="card-title text-white">Tracking Script</h2>
+        <p class="text-gray-400 mb-2">
+            Paste this snippet into the <code class="text-white">&lt;head&gt;</code> of your website to enable tracking:
+        </p>
+
+        <div class="relative">
+            <pre class="bg-base-300 text-sm rounded-md p-4 overflow-x-auto text-green-200">
+&lt;script src="{{ request.scheme }}://{{ request.get_host }}/pf.js" data-site="{{ site.site_id }}" defer&gt;&lt;/script&gt;
+            </pre>
+
+            <!-- Optional: Copy button (works well with Alpine.js or plain JS) -->
+            <button class="btn btn-xs btn-outline absolute top-2 right-2"
+                onclick="navigator.clipboard.writeText(`<script src='{{ request.scheme }}://{{ request.get_host }}/pf.js' data-site='{{ site.site_id }}' defer></script>`)">
+                Copy
+            </button>
+        </div>
+
+    </div>
+</div>
+
+{% endblock content %}

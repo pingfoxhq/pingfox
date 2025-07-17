@@ -3,6 +3,9 @@ from .forms import SiteCreationForm
 from django.contrib.auth.decorators import login_required
 from .models import Site
 from django.contrib import messages
+from apps.analytics.models import VisitorSession, PageView
+from django.core.paginator import Paginator
+from django.db.models import Count
 from apps.teams.utils import get_current_team
 from .tasks import verify_site
 
@@ -83,3 +86,55 @@ def delete_site(request, site_id):
         messages.success(request, "Site deleted successfully.")
         return redirect("sites:list")
     return render(request, "sites/delete.html", {"site": site})
+
+
+@login_required
+def site_details(request, site_id):
+    site = get_object_or_404(Site, site_id=site_id, owner=request.user)
+
+    visitors = VisitorSession.objects.filter(page_views__site=site).distinct()
+
+    page_views = PageView.objects.filter(site=site).order_by("-timestamp")
+
+    # Pagination for page views
+    per_page = request.GET.get("per_page", 10)
+    if str(per_page).isdigit():
+        per_page = int(per_page)
+    else:
+        per_page = 10
+    paginator = Paginator(page_views, per_page)  # Show per_page page views per page
+
+    top_pages = (
+        PageView.objects.filter(site=site)
+        .values("url")
+        .annotate(view_count=Count("id"))
+        .order_by("-view_count")[:5]
+    )
+
+    top_referrers = (
+        PageView.objects.filter(site=site)
+        .exclude(referrer__isnull=True)
+        .exclude(referrer__exact="")
+        .values("referrer")
+        .annotate(count=Count("id"))
+        .order_by("-count")[:5]
+    )
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        "site": site,
+        "visitors": visitors,
+        "page_views": page_obj,
+        "top_pages": top_pages,
+        "top_referrers": top_referrers,
+        "active_tab": "analytics",
+        "page_number": page_number,
+        "paginator": paginator,
+        "page_obj": page_obj,
+        "visitor_count": visitors.count(),
+        "page_view_count": page_views.count(),
+        "top_referrer_count": top_referrers.count(),
+        "top_page_count": top_pages.count(),
+    }
+    return render(request, "sites/details.html", context)

@@ -35,7 +35,7 @@
         <form id="schema-editor" method="post">
             {% csrf_token %}
             <label for="schema" class="block text-sm font-medium text-gray-400 mb-1">✏️ Form Schema (JSON)</label>
-            <textarea name="schema" rows="24" class="textarea textarea-bordered w-full text-sm font-mono"
+            <textarea name="schema" rows="24" class="textarea textarea-bordered w-full text-sm font-mono bg-gray-950 text-white border-0"
                 hx-post="{% url 'forms:convert' %}" hx-include="#schema-editor" hx-target="#form-preview"
                 hx-swap="innerHTML" hx-trigger="keyup changed delay:500ms"
                 placeholder="Enter your form schema here...">{{ schema|default:"{}" }}</textarea>

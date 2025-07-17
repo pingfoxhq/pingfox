@@ -29,7 +29,7 @@ class VisitorSession(models.Model):
         help_text=_("User agent string of the visitor's browser.")
     )
     def __str__(self):
-        return self.visitor_id
+        return f"Visitor {self.pf_id} - Last seen at {self.last_seen.isoformat()}"
 
 
 class PageView(models.Model):
@@ -56,6 +56,7 @@ class PageView(models.Model):
     )
     referrer = models.URLField(
         blank=True,
+        null=True,
         verbose_name=_("Referrer"),
         help_text=_("The URL of the page that referred the visitor to this page.")
     )

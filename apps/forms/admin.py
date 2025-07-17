@@ -39,6 +39,8 @@ class FormStyleInline(admin.TabularInline):
         "background_color",
         "text_color",
         "accent_color",
+        "button_color",
+        "button_text_color",
         "font_family",
         "logo",
         "custom_css_field",

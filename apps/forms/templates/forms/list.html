@@ -48,12 +48,14 @@
             </span>
         </div>
         <a href="{% url 'forms:edit' form.slug %}" class="btn">Edit Info</a>
-
+        <a href="{% url 'forms:schema' form.slug %}" hx-boost="false" class="btn btn-secondary btn-xs">View Schema</a>
         {% if form.is_locked %}
         <span class="badge badge-warning btn-xs">Frozen</span>
         {% else %}
+        <a href="{% url 'forms:builder' form.slug %}" class="btn btn-secondary btn-xs">Edit Builder</a>
         <a href="{% url 'forms:freeze' form.slug %}" class="btn btn-error btn-xs">Freeze</a>
         {% endif %}
+        <a href="{% url 'forms:delete' form.slug %}" class="btn btn-error btn-xs">Delete</a>
     </div>
     {% endfor %}
 </div>

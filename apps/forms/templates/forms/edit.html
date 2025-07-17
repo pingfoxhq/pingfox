@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
 {% block title %}
-Create a Form
+Edit a Form
 {% endblock %}
 
 {% block content %}
@@ -17,6 +19,17 @@ Create a Form
     Edit the details of your form. You can change the name, and other settings.
 </p>
 {% include 'core/partials/dashboard_tab.html' with active_tab="forms" %}
-{% include 'core/partials/create_form.html' with form=form button_text="Create" %}
+{% include 'core/partials/create_form.html' with form=form button_text="Save" %}
 
+{% if style_form %}
+<div class="mt-8">
+    <h2 class="text-2xl font-semibold text-white mb-4">Form Style</h2>
+    <form method="post" action="{% url 'forms:style_update' form_obj.slug %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ style_form.media }}
+        {{ style_form | crispy }}
+        <button class="btn btn-primary" type="submit">Update Style</button>
+    </form>
+</div>
+{% endif %}
 {% endblock content %}

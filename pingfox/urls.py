@@ -5,6 +5,8 @@ from django.urls import path, include
 
 urlpatterns = [
     path("", include("apps.core.urls")),
+    path("", include("apps.analytics.script_urls")),
+    path("api/", include("apps.analytics.api_urls")),
     path("dashboard/", include("apps.dashboard.urls")),
     path("accounts/", include("apps.accounts.urls")),
     path("analytics/", include("apps.analytics.urls")),

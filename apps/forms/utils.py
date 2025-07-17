@@ -23,10 +23,15 @@ def create_form_class_from_schema(schema):
 
         field_type = field.get("type", "text")
         required = field.get("required", False)
+        disabled = field.get("disabled", False)
+        readonly = field.get("readonly", False)
+        hidden = field.get("hidden", False)
+        
         options = field.get("options", None)
         validation_regex = field.get("validation")
-        help_text = field.get("helpText", "")
-        default_value = field.get("defaultValue", "")
+        help_text = field.get("help_text", "")
+        default_value = field.get("default_value", "")
+        placeholder = field.get("placeholder", label)
         validators = []
         if validation_regex:
             validators.append(
@@ -49,16 +54,17 @@ def create_form_class_from_schema(schema):
             fields[name] = forms.CharField(
                 label=label,
                 required=required,
-                widget=forms.TextInput(attrs={"placeholder": label}),
+                widget=forms.TextInput(attrs={"placeholder": placeholder}),
                 validators=validators,
                 help_text=help_text,
                 initial=default_value,
+
             )
         elif field_type == "textarea":
             fields[name] = forms.CharField(
                 label=label,
                 required=required,
-                widget=forms.Textarea(attrs={"placeholder": label}),
+                widget=forms.Textarea(attrs={"placeholder": placeholder}),
                 validators=validators,
                 help_text=help_text,
                 initial=default_value,
@@ -67,7 +73,7 @@ def create_form_class_from_schema(schema):
             fields[name] = forms.EmailField(
                 label=label,
                 required=required,
-                widget=forms.EmailInput(attrs={"placeholder": label}),
+                widget=forms.EmailInput(attrs={"placeholder": placeholder}),
                 validators=validators,
                 help_text=help_text,
                 initial=default_value,
@@ -76,7 +82,7 @@ def create_form_class_from_schema(schema):
             fields[name] = forms.IntegerField(
                 label=label,
                 required=required,
-                widget=forms.NumberInput(attrs={"placeholder": label}),
+                widget=forms.NumberInput(attrs={"placeholder": placeholder}),
                 validators=validators,
                 help_text=help_text,
                 initial=default_value,
@@ -85,7 +91,7 @@ def create_form_class_from_schema(schema):
             fields[name] = forms.DateField(
                 label=label,
                 required=required,
-                widget=forms.DateInput(attrs={"placeholder": label, "type": "date"}),
+                widget=forms.DateInput(attrs={"placeholder": placeholder, "type": "date"}),
                 validators=validators,
                 help_text=help_text,
                 initial=default_value,
@@ -110,11 +116,17 @@ def create_form_class_from_schema(schema):
             fields[name] = forms.CharField(
                 label=label,
                 required=required,
-                widget=forms.TextInput(attrs={"placeholder": label}),
+                widget=forms.TextInput(attrs={"placeholder": placeholder}),
                 validators=validators,
                 help_text=help_text,
                 initial=default_value,
             )
+
+        if hidden:
+            fields[name].widget = forms.HiddenInput()
+        if readonly:
+            fields[name].widget.attrs['readonly'] = 'readonly'
+        fields[name].disabled = disabled
 
     return type("DynamicForm", (forms.Form,), fields)
 
@@ -131,6 +143,15 @@ def create_form_from_form_model(form: Form):
             "options": field.choices.split(",") if field.choices else None,
             "validation_regex": field.validation_regex,
             "help_text": field.help_text,
+            "placeholder": field.placeholder,
+            "name": field.name,
+            "hidden": field.hidden,
+            "disabled": field.disabled,
+            "readonly": field.readonly,
+            "defaultValue": field.default_value,
+            "order": field.order,
+            "id": field.id,  # Include ID for reference
+            
         }
         for field in form.fields.all()
     ]
@@ -150,6 +171,13 @@ def convert_form_to_schema(form: Form):
             "options": field.choices.split(",") if field.choices else None,
             "validation_regex": field.validation_regex,
             "help_text": field.help_text,
+            "placeholder": field.placeholder or field.label,
+            "name": field.name,
+            "hidden": field.hidden,
+            "disabled": field.disabled,
+            "readonly": field.readonly,
+            "default_value": field.default_value,
+
         }
         for field in form.fields.all()
     ]

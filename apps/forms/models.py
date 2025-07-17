@@ -102,20 +102,22 @@ class Form(models.Model):
         verbose_name=_("Redirect URL"),
         help_text=_("URL to redirect users after form submission."),
     )
-    allow_anonymous_submissions = models.BooleanField(
-        default=False,
-        verbose_name=_("Allow Anonymous Submissions"),
-        help_text=_(
-            "Indicates whether the form can be submitted by users who are not authenticated."
-        ),
-    )
+
     allow_multiple_submissions = models.BooleanField(
-        default=False,
+        default=True,
         verbose_name=_("Allow Multiple Submissions"),
         help_text=_(
             "Indicates whether users can submit this form multiple times."
         ),
     )
+
+    button_text = models.CharField(
+        max_length=255,
+        default=_("Submit"),
+        verbose_name=_("Button Text"),
+        help_text=_("The text displayed on the form submission button."),
+    )
+
     # This field is used to track visitors who have interacted with the form
     # It can be used for analytics or to prevent spam submissions also for preventing multiple submissions
     visitors = models.ManyToManyField(
@@ -203,6 +205,16 @@ class FormStyle(models.Model):
         verbose_name=_("Accent Color"),
         help_text=_("The accent color used for buttons and highlights in the form."),
     )
+    button_color = ColorField(
+        default="#f97316",
+        verbose_name=_("Button Color"),
+        help_text=_("The color of the form submission button."),
+    )
+    button_text_color = ColorField(
+        default="#ffffff",
+        verbose_name=_("Button Text Color"),
+        help_text=_("The text color of the form submission button."),
+    )
 
     font_family = models.CharField(
         max_length=100,
@@ -236,6 +248,11 @@ class FormStyle(models.Model):
         verbose_name = _("Form Style")
         verbose_name_plural = _("Form Styles")
 
+    def get_font_family_display(self):
+        """
+        Returns a human-readable display of the font family.
+        """
+        return dict(self.FONT_CHOICES).get(self.font_family, self.font_family)
 
 class FormField(models.Model):
     FIELD_TYPES = [

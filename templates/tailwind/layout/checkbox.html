@@ -10,8 +10,7 @@
 
     <div id="div_{{ field.auto_id }}"
         class="flex flex-row{% if wrapper_class %} {{ wrapper_class }}{% endif %}{% if field.css_classes %} {{ field.css_classes }}{% endif %}">
-        <input type="checkbox" {% if choice.0 in field.value or choice.0|stringformat:"s" in field.value or choice.0|stringformat:"s" == field.value|default_if_none:""|stringformat:"s" %} checked="checked" {% endif %}
-            name="{{ field.html_name }}" id="id_{{ field.html_name }}_{{ forloop.counter }}"
-            value="{{ choice|unlocalize }}" {{ field.field.widget.attrs|flatatt }} class="checkbox">
+        {{ field }}
+        
     </div>
 </div>

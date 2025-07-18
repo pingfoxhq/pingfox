@@ -26,7 +26,7 @@ def create_form_class_from_schema(schema):
         disabled = field.get("disabled", False)
         readonly = field.get("readonly", False)
         hidden = field.get("hidden", False)
-        
+
         options = field.get("options", None)
         validation_regex = field.get("validation")
         help_text = field.get("help_text", "")
@@ -58,7 +58,6 @@ def create_form_class_from_schema(schema):
                 validators=validators,
                 help_text=help_text,
                 initial=default_value,
-
             )
         elif field_type == "textarea":
             fields[name] = forms.CharField(
@@ -91,7 +90,9 @@ def create_form_class_from_schema(schema):
             fields[name] = forms.DateField(
                 label=label,
                 required=required,
-                widget=forms.DateInput(attrs={"placeholder": placeholder, "type": "date"}),
+                widget=forms.DateInput(
+                    attrs={"placeholder": placeholder, "type": "date"}
+                ),
                 validators=validators,
                 help_text=help_text,
                 initial=default_value,
@@ -125,7 +126,7 @@ def create_form_class_from_schema(schema):
         if hidden:
             fields[name].widget = forms.HiddenInput()
         if readonly:
-            fields[name].widget.attrs['readonly'] = 'readonly'
+            fields[name].widget.attrs["readonly"] = "readonly"
         fields[name].disabled = disabled
 
     return type("DynamicForm", (forms.Form,), fields)
@@ -135,26 +136,7 @@ def create_form_from_form_model(form: Form):
     """
     Create a Django form class from a Form model instance.
     """
-    schema = [
-        {
-            "label": field.label,
-            "required": field.required,
-            "type": field.field_type,
-            "options": field.choices.split(",") if field.choices else None,
-            "validation_regex": field.validation_regex,
-            "help_text": field.help_text,
-            "placeholder": field.placeholder,
-            "name": field.name,
-            "hidden": field.hidden,
-            "disabled": field.disabled,
-            "readonly": field.readonly,
-            "defaultValue": field.default_value,
-            "order": field.order,
-            "id": field.id,  # Include ID for reference
-            
-        }
-        for field in form.fields.all()
-    ]
+    schema = convert_form_to_schema(form)
 
     return create_form_class_from_schema(schema)
 
@@ -177,7 +159,6 @@ def convert_form_to_schema(form: Form):
             "disabled": field.disabled,
             "readonly": field.readonly,
             "default_value": field.default_value,
-
         }
         for field in form.fields.all()
     ]

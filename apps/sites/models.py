@@ -3,6 +3,7 @@ from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 from django.db import models
 from apps.teams.models import Team
+from apps.forms.models import Form
 
 
 def generate_site_id():
@@ -120,6 +121,16 @@ class Site(models.Model):
         verbose_name=_("Last Indexed"),
         help_text=_("The date and time when the site was last indexed for content."),
     )
+    form = models.ForeignKey(
+        Form,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="sites",
+        verbose_name=_("Form"),
+        help_text=_("The form associated with this site, if any."),
+    )
+         
 
     class Meta:
         verbose_name = _("Site")

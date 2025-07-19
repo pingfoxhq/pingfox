@@ -62,3 +62,16 @@ class UserProfileEditForm(forms.ModelForm):
     widgets = {
         "avatar": forms.ClearableFileInput(attrs={"class": "file-input"}),
     }
+
+
+class UserActivationEmailChangeForm(forms.Form):
+    """
+    Form to handle email change for user activation.
+    """
+
+    email = forms.EmailField(
+        max_length=254,
+        label="New Email Address",
+        widget=forms.EmailInput(attrs={"placeholder": "Enter your new email address"}),
+        help_text="If you want to change your email address, please enter the new email here.",
+    )

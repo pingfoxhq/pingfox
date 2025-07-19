@@ -1,62 +1,73 @@
 {% extends "base.html" %}
 {% load static %}
-{% load crispy_forms_tags %}
+{% load bulma_tags %}
 
 {% block title %}Account Settings{% endblock %}
 
 {% block content %}
 
-<h1 class="text-3xl font-semibold text-white mb-2">Account settings</h1>
-<p class="text-sm text-gray-400 mb-8">Manage your personal info, integrations and preferences</p>
+<h3 class="title is-3  mb-4">Account settings</h3>
+<p class="subtitle  mb-5">Manage your personal info, integrations and preferences</p>
 {% include 'core/partials/dashboard_tab.html' with active_tab="accounts" %}
 
-<div class="grid grid-cols-1 md:grid-cols-5 gap-8">
+<div class="columns is-variable is-5">
 
   <!-- Left Nav -->
-  <div class="md:col-span-1 space-y-2">
-    <div class="text-sm font-semibold text-gray-300 uppercase">Preferences</div>
-    <ul class="menu bg-transparent text-sm space-y-1">
-      <li><a class="active">Account Settings</a></li>
-      <li><a>Access Tokens</a></li>
-      <li><a>Security</a></li>
-    </ul>
+  <div class="column is-3">
+    <p class="is-size-7 er has-text-weight-semibold is-uppercase mb-2">Preferences</p>
+    <aside class="menu">
+      <ul class="menu-list">
+        <li><a class="is-active">Account Settings</a></li>
+        <li><a>Access Tokens</a></li>
+        <li><a>Security</a></li>
+      </ul>
+    </aside>
   </div>
 
   <!-- Main Form Area -->
-  <div class="md:col-span-4 space-y-10">
+  <div class="column is-9">
+    <form method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
 
-    <!-- Profile Information Card -->
-    <form method="POST" enctype="multipart/form-data" class="space-y-4">
-      <div class="bg-base-200 border border-base-300 rounded-xl p-6">
-        <div class="flex items-center space-x-6">
-          <div class="avatar">
-            <div class="w-20 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
-              <img src="{{ user.userprofile.avatar.url }}" alt="Avatar" />
+      <!-- Avatar Card -->
+      <div class="box mb-5">
+        <div class="level is-mobile">
+          <div class="level-left">
+            <figure class="image is-96x96 mr-4">
+              <img class="is-rounded" src="{{ user.userprofile.avatar.url }}" alt="Avatar">
+            </figure>
+            <div class="level-item">
+              {{ pform.avatar|bulma }}
             </div>
-          </div>
-          <div class="form-control w-full max-w-xs">
-            {{ pform.avatar|as_crispy_field }}
           </div>
         </div>
       </div>
-      <div class="bg-base-200 border border-base-300 rounded-xl p-6 space-y-6">
-        <!-- Avatar Upload Section -->
-        {% csrf_token %}
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+      <!-- Profile Information Card -->
+      <div class="box">
+        <div class="columns is-multiline">
           {% for field in uform %}
-          <div>{{ field|as_crispy_field }}</div>
+          <div class="column is-half">
+            {{ field|bulma }}
+          </div>
           {% endfor %}
+
           {% for field in pform %}
           {% if field.name != "avatar" %}
-          <div>{{ field|as_crispy_field }}</div>
+          <div class="column is-half">
+            {{ field|bulma }}
+          </div>
           {% endif %}
           {% endfor %}
         </div>
-        <div class="flex justify-end space-x-3 pt-4 border-t border-base-300 mt-4">
-          <a href="{% url 'accounts:index' %}" class="btn btn-ghost btn-sm">Cancel</a>
-          <button type="submit" class="btn btn-primary btn-sm">Save</button>
+
+        <div class="is-flex is-justify-content-flex-end mt-4 pt-4" style="border-top: 1px solid #ccc;">
+          <a href="{% url 'accounts:index' %}" class="button is-light is-small mr-2">Cancel</a>
+          <button type="submit" class="button is-primary is-small">Save</button>
         </div>
+      </div>
     </form>
   </div>
 </div>
+
 {% endblock %}

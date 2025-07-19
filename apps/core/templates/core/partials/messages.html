@@ -1,16 +1,55 @@
 {% if messages %}
-  <div class="max-w-3xl mx-auto px-4 mt-4 space-y-3">
-    {% for message in messages %}
-      <div class="{% if message.tags == 'success' %}bg-success text-green-100 border border-success-border
-                   {% elif message.tags == 'error' %}bg-danger text-red-100 border border-danger-border
-                   {% elif message.tags == 'warning' %}bg-warning text-yellow-100 border border-warning-border
-                   {% else %}bg-info text-white border border-info-border{% endif %}
-                  rounded-md px-4 py-3 text-sm shadow-sm flex justify-between items-start">
-
-        <span>{{ message }}</span>
-        
-        <button onclick="this.parentElement.remove()" class="ml-4 text-lg leading-none text-white hover:text-gray-400">&times;</button>
-      </div>
-    {% endfor %}
-  </div>
+<div
+  x-data="{
+    toasts: [
+      {% for message in messages %}
+      {
+        message: '{{ message|escapejs }}',
+        tags: '{{ message.tags }}'
+      },
+      {% endfor %}
+    ]
+  }"
+  x-init="
+    setTimeout(() => {
+      toasts = [];
+    }, 4000);
+  "
+  style="position: fixed; top: 1rem; right: 1rem; z-index: 9999;"
+>
+  <template x-for="(msg, idx) in toasts" :key="idx">
+    <div
+      x-show="true"
+      x-transition
+      class="notification"
+      :class="{
+        'is-success': msg.tags === 'success',
+        'is-danger': msg.tags === 'error',
+        'is-warning': msg.tags === 'warning',
+        'is-info': !['success', 'error', 'warning'].includes(msg.tags)
+      }"
+      style="min-width: 500px; margin-bottom: 0.75rem;"
+    >
+      <button class="delete" @click="toasts.splice(idx, 1)"></button>
+      <strong x-text="msg.message"></strong>
+    </div>
+  </template>
+</div>
 {% endif %}
+
+<style>
+  [x-cloak] { display: none; }
+  .notification {
+    animation: slideIn 0.1s ease-out;
+  }
+
+  @keyframes slideIn {
+    from {
+      transform: translateX(100%);
+    }
+
+    to {
+      transform: translateX(0);
+    }
+  }
+</style>

@@ -30,6 +30,10 @@ def set_base_free_plan(sender, instance, created, **kwargs):
     """
     if created:
         # Assuming you have a method to get the base free plan
-        base_free_plan = Plan.objects.get(base_free=True)
+        base_free_plan, _ = Plan.objects.get_or_create(is_base_plan=True, defaults={
+            'name': 'Base Free Plan',
+            'description': 'This is the base free plan for new teams.',
+            'price': 0,
+        })
         instance.plan = base_free_plan
         instance.save()

@@ -4,18 +4,19 @@ Create a Form
 {% endblock %}
 
 {% block content %}
-<div class="flex items-center justify-between">
-
-    <h1 class="text-3xl font-semibold text-white mb-2">
-        Create a Form
-    </h1>
-    <a href="{% url 'forms:list' %}" class="btn btn-sm">
-        &leftarrow; Back to Forms List
+<div class="is-flex is-justify-content-space-between is-align-items-center mb-4">
+    <div>
+        <h3 class="title  is-3">
+            Create a Form
+        </h3>
+        <p class="subtitle has-text-grey">
+            Create a headless form, don't worry about the backend, we will handle it.
+        </p>
+    </div>
+    <a href="{% url 'forms:list' %}" class="button is-small">
+        ← Back to Forms List
     </a>
 </div>
-<p class="text-sm text-gray-400 mb-8">
-    Create a headless form, don't worry about the backend, we will handle it.
-</p>
 {% include 'core/partials/dashboard_tab.html' with active_tab="forms" %}
 {% include 'core/partials/create_form.html' with form=form button_text="Create" %}
 {% endblock content %}

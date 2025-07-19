@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from .models import Team, TeamMember, User
-from .forms import TeamCreationForm, OwnershipTransferForm
+from .forms import TeamCreationForm, OwnershipTransferForm, TeamEditForm
 from django.contrib import messages
 from .utils import switch_team, get_user_teams, get_current_team
 
@@ -94,3 +94,17 @@ def leave_team(request, slug):
         messages.success(request, "You have left the team.")
         return redirect('teams:list')
     return render(request, 'teams/leave.html', {'team': team})
+
+
+@login_required
+def team_edit(request, slug):
+    """
+    Edit the details of a team.
+    """
+    team = get_object_or_404(Team, slug=slug, owner=request.user)
+    form = TeamEditForm(instance=team, data=request.POST or None, files=request.FILES or None)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Team details updated successfully!")
+        return redirect('teams:detail', slug=team.slug)
+    return render(request, 'teams/edit.html', {'form': form, 'team': team})

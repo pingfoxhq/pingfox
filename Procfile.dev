@@ -1,3 +1,2 @@
 web: python -m uvicorn pingfox.asgi:application --reload --reload-include *.html --reload-include *.css --reload-include *.js
 worker: python manage.py rundramatiq
-tailwind: npx @tailwindcss/cli -i apps/core/static/src/input.css -o apps/core/static/build.css --watch

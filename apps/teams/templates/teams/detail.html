@@ -3,53 +3,69 @@
 {% block title %}Team Details - {{ team.name }}{% endblock %}
 
 {% block content %}
-<div class="flex items-center justify-between">
-  <h1 class="text-3xl font-semibold text-white mb-2">Your Teams</h1>
-  <a href="{% url 'teams:create' %}" class="btn btn-primary btn-sm">+ Create New Team</a>
+<div class="is-flex is-justify-content-space-between is-align-items-center mb-4">
+  <h1 class="title is-3 ">Your Teams</h1>
+  <a href="{% url 'teams:create' %}" class="button is-primary is-small">+ Create New Team</a>
 </div>
-<p class="text-sm text-gray-400 mb-8">
+
+<p class="is-size-7  mb-5">
   Manage your teams, switch between them, or create a new one to collaborate with your members.
 </p>
+
 {% include 'core/partials/dashboard_tab.html' with active_tab="teams" %}
 
-<div class="max-w-6xl mx-auto px-6 pb-10 text-white">
-  <div class="flex items center justify-between mb-6">
-    <h1 class="text-3xl font-bold">{{ team.name }}</h1>
-    <div class="flex items-center space-x-4">
+<div class="container px-4 pb-6 ">
+  <div class="is-flex is-justify-content-space-between is-align-items-center mb-4">
+    <h1 class="title is-3">{{ team.name }}</h1>
+    <div class="buttons are-small">
       {% if request.user.is_authenticated and request.user == team.owner %}
-      <a href="{% url 'teams:transfer_ownership' team.slug %}" class="btn btn-sm btn-outline btn-accent">Transfer Ownership</a>
+      <a href="{% url 'teams:transfer_ownership' team.slug %}" class="button is-outlined is-link">Transfer Ownership</a>
       {% endif %}
-      <a href="{% url 'teams:list' %}" class="btn btn-sm btn-secondary">Back to Teams</a>
+      <a href="{% url 'teams:list' %}" class="button is-secondary">Back to Teams</a>
     </div>
-    </div>
-    <div class="card bg-base-200 shadow-md border border-base-300">
-        <div class="card-body">
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="card-title text-xl">{{ team.plan.name }}</h2>
-                {% if team.logo %}
-                <img src="{{ team.logo.url }}" alt="{{ team.name }} Logo" class="w-10 h-10 rounded-md object-cover">
-                {% endif %}
-            </div>
-            <p class="text-sm text-gray-400 mb-2">Slug: <code>{{ team.slug }}</code></p>
-            <p class="text-sm text-gray-400 mb-4">Owner: {{ team.owner.get_full_name|default:team.owner.username }}</p>
-            <p class="text-sm text-gray-400 mb-4">Description: {{ team.description|default:"No description provided." }}</p>
-            <p class="text-sm text-gray-400 mb-4">Created on: {{ team.created_at|date:"F j, Y" }}</p>
-            <p class="text-sm text-gray-400 mb-4">Members:</p>
-            <ul class="list-disc pl-5">
-                {% for member in team.members.all %}
-                <li>{{ member.get_full_name|default:member.username }}{% if member.is_owner %} (Owner){% endif %}</li>
-                {% empty %}
-                <li>No members in this team.</li>
-                {% endfor %}
-            </ul>
-            {% if request.user.is_authenticated and request.user == team.owner %}
-            <div class="mt-6">
-                <a href="" class="btn btn-sm btn-primary">Edit Team</a>
-                <a href="{% url 'teams:transfer_ownership' team.slug %}" class="btn btn-sm btn-error">Transfer Ownership</a>
+  </div>
 
-            </div>
-            {% endif %}
-        </div>
+  <div class="box">
+    <div class="is-flex is-justify-content-space-between is-align-items-center mb-4">
+      <h2 class="title is-4">{{ team.plan.name }}</h2>
+      {% if team.logo %}
+      <figure class="image is-48x48">
+        <img class="is-rounded" src="{{ team.logo.url }}" alt="{{ team.name }} Logo">
+      </figure>
+      {% endif %}
     </div>
+
+    <p class="is-size-7  mb-2">
+      <strong>Slug:</strong> <code>{{ team.slug }}</code>
+    </p>
+
+    <p class="is-size-7  mb-2">
+      <strong>Owner:</strong> {{ team.owner.get_full_name|default:team.owner.username }}
+    </p>
+
+    <p class="is-size-7  mb-2">
+      <strong>Description:</strong> {{ team.description|default:"No description provided." }}
+    </p>
+
+    <p class="is-size-7  mb-2">
+      <strong>Created on:</strong> {{ team.created_at|date:"F j, Y" }}
+    </p>
+
+    <p class="is-size-7  mb-1"><strong>Members:</strong></p>
+    <ul class="ml-4">
+      {% for member in team.members.all %}
+      <li>{{ member.get_full_name|default:member.username }}{% if member.is_owner %} (Owner){% endif %}</li>
+      {% empty %}
+      <li>No members in this team.</li>
+      {% endfor %}
+    </ul>
+
+    {% if request.user.is_authenticated and request.user == team.owner %}
+    <div class="mt-4">
+      <a href="{% url 'teams:edit' team.slug %}" class="button is-small is-primary">Edit Team</a>
+      <a href="{% url 'teams:transfer_ownership' team.slug %}" class="button is-small is-danger">Transfer Ownership</a>
+    </div>
+    {% endif %}
+  </div>
 </div>
 {% endblock content %}

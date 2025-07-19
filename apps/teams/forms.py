@@ -35,3 +35,32 @@ class OwnershipTransferForm(ModelForm):
         fields = [
             "new_owner",
         ]
+
+
+class TeamEditForm(ModelForm):
+    """
+    Form for editing team details.
+    """
+    class Meta:
+        model = Team
+        fields = [
+            "name",
+            "logo",
+        ]
+
+
+class TeamInviteForm(ModelForm):
+    """
+    Form for inviting a user to a team.
+    """
+    email = CharField(
+        max_length=150,
+        help_text="Enter the email of the user to invite.",
+        widget=TextInput(attrs={"placeholder": "User Email"}),
+    )
+
+    class Meta:
+        model = Team
+        fields = [
+            "email",
+        ]

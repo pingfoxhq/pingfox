@@ -5,9 +5,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{% static 'build.css' %}">
     <script src="{% static 'htmx.min.js' %}"></script>
-    <script src='http://localhost:8000/pf.js' data-site='ZJWUDTGzcwI' defer></script>
+    <link rel="stylesheet" href="{% static 'main.css' %}">
+    <link rel="stylesheet" href="{% static 'bulma/output.css' %}">
+    <!-- <script src="{% static 'unpoly/unpoly.min.js' %}"></script> -->
+    <!-- <link rel="stylesheet" href="{% static 'unpoly/unpoly.min.css' %}"> -->
+    <script src="{{ PINGFOX_JS_SRC_URL }}" data-site='{{ PINGFOX_SITE_ID }}' defer></script>
 
     {% include 'core/partials/favicon.html' %}
 
@@ -18,21 +21,28 @@
     </title>
 </head>
 
-<body class="bg-fox-bg text-fox-text min-h-screen " hx-boost="true">
+<body hx-boost="true">
 
     {% include 'core/partials/loader.html' %}
-    {% include 'core/partials/navbar.html' %}
-    {% include 'core/partials/messages.html' %}
-    <div class="max-w-6xl mx-auto px-6 py-10">
-        {% block content %}
-
-        {% endblock content %}
-    </div>
+    {% include 'core/islands/navbar.html' %}
+    <main class="container" up-main>
+        <section class="section">
+            {% include 'core/partials/messages.html' %}
+            {% block content %}{% endblock %}
+        </section>
+    </main>
 </body>
 
 <script src="{% static 'sortable.js' %}"></script>
 <script src="{% static 'alpine.min.js' %}"></script>
-<!-- ... your content ... -->
+
+<script>
+  document.body.addEventListener('htmx:afterSwap', () => {
+    // Re-initialize Alpine
+    if (window.Alpine) Alpine.initTree(document.body);
+  });
+</script>
+
 </body>
 
 

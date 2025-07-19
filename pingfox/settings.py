@@ -11,25 +11,47 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
-from dotenv import load_dotenv
+import environ
 import os
 
-load_dotenv(dotenv_path="../.env")
+env = environ.Env(
+    DEBUG=(bool, False),
+    DJANGO_DEBUG=(bool, False),
+    DJANGO_SECRET_KEY=(str, "your-default-secret-key"),
+    DJANGO_ALLOWED_HOSTS=(str, "localhost"),
+    SITE_URL=(str, "http://localhost:8000"),
+    DB_TYPE=(str, "sqlite"),
+    DB_NAME=(str, "db.sqlite3"),
+    DB_USER=(str, ""),
+    DB_PASSWORD=(str, ""),
+    DB_HOST=(str, "localhost"),
+    DB_PORT=(str, "5432"),
+    REDIS_URL=(str, "redis://localhost:6379"),
+    DJANGO_EMAIL_BACKEND=(str, "django.core.mail.backends.console.EmailBackend"),
+    EMAIL_HOST=(str, "smtp.gmail.com"),
+    EMAIL_PORT=(int, 587),
+    EMAIL_USE_TLS=(bool, True),
+    EMAIL_HOST_USER=(str, "admin@pingfox.in"),
+    EMAIL_HOST_PASSWORD=(str, "your-email-password"),
+    PINGFOX_SITE_ID=(str, "default-site-id"),
+    PINGFOX_JS_SRC_URL=(str, "http://localhost:8000/pf.js"),
+    PINGFOX_VERIFICATION_TOKEN=(str, "default-verification-token"),
+)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SITE_URL = os.getenv("SITE_URL", "http://localhost:8000")
+SITE_URL = env("SITE_URL", default="http://localhost:8000")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
-SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "your-default-secret-key")
-DEBUG = os.getenv("DJANGO_DEBUG", "True").lower() in (
+SECRET_KEY = env("DJANGO_SECRET_KEY", default="your-default-secret-key")
+DEBUG = env("DJANGO_DEBUG", default="True").lower() in (
     "true",
     "1",
 )
-ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "localhost").split(",")
+ALLOWED_HOSTS = env("DJANGO_ALLOWED_HOSTS", default="localhost").split(",")
 
 
 # Application definition
@@ -42,9 +64,10 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django_cleanup.apps.CleanupConfig",
+    "django_dramatiq",
+    "colorfield",
+    "apps.bulma.apps.BulmaConfig",
     "apps.core.apps.CoreConfig",
-    "crispy_forms",
-    "crispy_tailwind",
     "apps.accounts.apps.AccountsConfig",
     "apps.billing.apps.BillingConfig",
     "apps.sites.apps.SitesConfig",
@@ -61,10 +84,6 @@ LOGOUT_REDIRECT_URL = "home"
 LOGIN_REDIRECT_URL = "dashboard:index"
 
 
-CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
-
-CRISPY_TEMPLATE_PACK = "tailwind"
-
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -74,15 +93,16 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "apps.accounts.middleware.UserActivationMiddleware",
 ]
 
 
-INSTALLED_APPS += ["django_dramatiq", "colorfield"]
+INSTALLED_APPS += []
 
 DRAMATIQ_BROKER = {
     "BROKER": "dramatiq.brokers.redis.RedisBroker",
     "OPTIONS": {
-        "url": os.getenv("REDIS_URL", "redis://localhost:6379"),
+        "url": env("REDIS_URL", default="redis://localhost:6379"),
     },
     "MIDDLEWARE": [
         "dramatiq.middleware.Prometheus",
@@ -108,6 +128,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "apps.billing.context_processors.pricing_plans",
                 "apps.teams.context_processors.team_context_processor",
+                "apps.core.context_processors.site_context_processor",
             ],
         },
     },
@@ -123,11 +144,11 @@ if os.environ.get("DB_TYPE") == "postgres":
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
-            "NAME": os.getenv("DB_NAME"),
-            "USER": os.getenv("DB_USER"),
-            "PASSWORD": os.getenv("DB_PASSWORD"),
-            "HOST": os.getenv("DB_HOST", "localhost"),
-            "PORT": os.getenv("DB_PORT", "5432"),
+            "NAME": env("DB_NAME"),
+            "USER": env("DB_USER"),
+            "PASSWORD": env("DB_PASSWORD"),
+            "HOST": env("DB_HOST", default="localhost"),
+            "PORT": env("DB_PORT", default="5432"),
         }
     }
 else:
@@ -179,17 +200,23 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
-EMAIL_BACKEND = os.getenv(
-    "DJANGO_EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend"
+EMAIL_BACKEND = env(
+    "DJANGO_EMAIL_BACKEND", default="django.core.mail.backends.console.EmailBackend"
 )
-EMAIL_HOST = os.getenv("EMAIL_HOST", "smtp.gmail.com")
-EMAIL_PORT = int(os.getenv("EMAIL_PORT", 587))
-EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True").lower() in ("true", "1")
-EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "admin@pingfox.in")
-EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "your-email-password")
+EMAIL_HOST = env("EMAIL_HOST", default="smtp.gmail.com")
+EMAIL_PORT = env("EMAIL_PORT", default=587)
+EMAIL_USE_TLS = env("EMAIL_USE_TLS", default="True").lower() in ("true", "1")
+EMAIL_HOST_USER = env("EMAIL_HOST_USER", default="admin@pingfox.in")
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", default="your-email-password")
 
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+PINGFOX_SITE_ID = env("PINGFOX_SITE_ID", default="default-site-id")
+PINGFOX_JS_SRC_URL = env("PINGFOX_JS_SRC_URL", default="http://localhost:8000/pf.js")
+PINGFOX_VERIFICATION_TOKEN = env(
+    "PINGFOX_VERIFICATION_TOKEN", default="default-verification-token"
+)

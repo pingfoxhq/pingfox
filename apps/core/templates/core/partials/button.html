@@ -1,5 +1,10 @@
-<div>
-    <button type="submit" class="btn btn-accent w-full">
+<div class="field is-grouped">
+    {% if cancel_url %}
+    <div class="control">
+        <a href="{{ cancel_url }}" class="button is-light">Cancel</a>
+    </div>
+    {% endif %}
+    <button type="submit" class="button is-primary">
         {{ button_text }}
     </button>
 </div>

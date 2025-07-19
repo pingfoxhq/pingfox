@@ -6,15 +6,17 @@ from apps.accounts.forms import (
     UserProfileEditForm,
     UserSignupForm,
     UserActivationForm,
+    UserActivationEmailChangeForm,
 )
-from .models import User, UserActivation
+from apps.core.utils import get_or_null
+from .models import UserActivation
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .tasks import send_user_activation_email
 
 
 @login_required
-def index(request):
+def accounts_dashboard(request):
     """
     Render the user profile page for the authenticated user.
     Allows the user to edit their profile and user information.
@@ -46,7 +48,7 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            return redirect("dashboard:index")
+            return redirect("sites:index")
 
     return render(request, "accounts/login.html", {"form": form})
 
@@ -67,11 +69,7 @@ def register_view(request):
     form = UserSignupForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
         user = form.save(commit=False)
-        user.is_active = False  # Deactivate account until it is activated
-        user.save()
-        request.session["activation_code"] = user.activation.activation_code
-        request.session["user_id"] = user.id
-        send_user_activation_email.send(user.id)
+        login(request, user)
         messages.success(
             request,
             "Registration successful! Please check your email for activation code.",
@@ -80,6 +78,7 @@ def register_view(request):
     return render(request, "accounts/register.html", {"form": form})
 
 
+@login_required
 def activate_view(request):
     """
     Render the second step of the user registration wizard.
@@ -88,19 +87,45 @@ def activate_view(request):
     form = UserActivationForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
         activation_code = form.cleaned_data.get("activation_code")
-        user_id = request.session.get("user_id")
-        activation = UserActivation.objects.filter(
-            user__id=user_id, activation_code=activation_code
-        ).first()
+        activation = get_or_null(
+            UserActivation,
+            user=request.user,
+            activation_code=activation_code,
+            is_active=False,
+        )
         if activation:
-            activation.activate()
-            messages.success(
-                request,
-                "Your account has been activated successfully!",
-            )
-            login(request, activation.user)
+            if activation.activate():
+                messages.success(
+                    request,
+                    "Your account has been activated successfully!",
+                )
+                login(request, activation.user)
+            else:
+                messages.error(request, "Activation code is invalid or expired.")
             return redirect("dashboard:index")
         else:
             messages.error(request, "Invalid activation code.")
 
     return render(request, "accounts/activate.html", {"form": form})
+
+
+@login_required
+def resend_activation_view(request):
+    """
+    Resend the activation email to the user.
+    Also get the email from the user, if they want to change it.
+    """
+    form = UserActivationEmailChangeForm(
+        request.POST or None, initial={"email": request.user.email}
+    )
+    if form.is_valid() and request.method == "POST":
+        email = form.cleaned_data.get("email")
+        if email:
+            request.user.email = email
+            request.user.save()
+        send_user_activation_email.send(request.user.id)
+        messages.success(
+            request, "Activation email resent successfully! Please check your inbox."
+        )
+        return redirect("accounts:activate")
+    return render(request, "accounts/resend_activation.html", {"form": form})

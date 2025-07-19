@@ -7,141 +7,133 @@ Site Details – {{ site.name }}
 {% endblock title %}
 
 {% block content %}
-
-<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6">
-    <div>
-        <h1 class="text-3xl font-bold text-white">{{ site.name }}</h1>
-        <p class="text-sm text-gray-400 mt-1">
-            Site ID: <span class="text-white font-mono">{{ site.site_id }}</span>
+<div class="level mb-5">
+  <div class="level-left">
+    <div class="level-item">
+      <div>
+        <h1 class="title ">{{ site.name }}</h1>
+        <p class="subtitle is-size-7 ">
+          Site ID: <span class=" is-family-monospace">{{ site.site_id }}</span>
         </p>
+      </div>
     </div>
-
-    <a href="{% url 'sites:list' %}" class="btn btn-sm btn-outline mt-4 sm:mt-0">
-        ← Back to Sites List
-    </a>
+  </div>
+  <div class="level-right">
+    <div class="level-item">
+      <a href="{% url 'sites:list' %}" class="button is-small is-outlined">← Back to Sites List</a>
+    </div>
+  </div>
 </div>
 
 {% include 'core/partials/dashboard_tab.html' with active_tab="sites" %}
-<div class="bg-box-alt p-6 rounded-xl shadow mb-6">
-    {% include 'analytics/partials/site_chart.html' with site=site %}
 
-</div>
-<div class="container mx-auto py-6">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-        <div class="bg-box-alt p-6 rounded-xl shadow">
-            <h2 class="text-white text-lg mb-2">Total Visitors</h2>
-            <p class="text-3xl font-bold text-green-400">{{ visitors|length }}</p>
-        </div>
-        <div class="bg-box-alt p-6 rounded-xl shadow">
-            <h2 class="text-white text-lg mb-2">Recent Page Views</h2>
-            <p class="text-xl text-gray-400">{{ page_views|length }}</p>
-        </div>
-    </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        <!-- Top Pages -->
-        <div class="bg-box-alt rounded-2xl p-4 shadow-md">
-            <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-info" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7h18M3 12h18M3 17h18" />
-                </svg>
-                Top Pages
-            </h3>
-            <ul class="space-y-2">
-                {% for page in top_pages %}
-                <li class="flex justify-between items-center text-sm text-gray-300">
-                    <span class="truncate" title="{{ page.url }}">{{ page.url | truncatechars:60 }}</span>
-                    <span class="badge badge-info badge-sm">{{ page.view_count }} views</span>
-                </li>
-                {% empty %}
-                <li class="text-gray-400">No data available.</li>
-                {% endfor %}
-            </ul>
-        </div>
-
-        <!-- Top Referrers -->
-        <div class="bg-box-alt rounded-2xl p-4 shadow-md">
-            <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-success" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M12 11c0 2.28-1.72 4-4 4s-4-1.72-4-4 1.72-4 4-4 4 1.72 4 4zm6 0c0 2.28-1.72 4-4 4s-4-1.72-4-4 1.72-4 4-4 4 1.72 4 4z" />
-                </svg>
-                Top Referrers
-            </h3>
-            <ul class="space-y-2">
-                {% for ref in top_referrers %}
-                <li class="flex justify-between items-center text-sm text-gray-300">
-                    <div class="flex items-center gap-2">
-                        <img src="{{ ref.referrer|favicon }}" alt="favicon" class="w-4 h-4 rounded" />
-                        <span class="truncate" title="{{ ref.referrer }}">{{ ref.referrer|domain }}</span>
-                    </div>
-                    <span class="badge badge-success badge-sm">{{ ref.count }} hits</span>
-                </li>
-                {% empty %}
-                <li class="text-gray-400">No referrer data available.</li>
-                {% endfor %}
-            </ul>
-        </div>
-
-    </div>
-
-
-    <div>
-        <h3 class="text-xl font-semibold text-white mb-4">Recent Views</h3>
-        <!-- Download as csv -->
-        <a href="{% url 'analytics:download_csv' site.site_id %}" class="btn btn-sm btn-outline text-gray-400 mb-4">
-            Download as CSV
-        </a>
-        <table class="w-full text-left text-sm text-gray-400">
-            <thead>
-                <tr class="bg-gray-800 text-gray-500">
-                    <th class="py-2 px-3">Time</th>
-                    <th class="py-2 px-3">Visitor</th>
-                    <th class="py-2 px-3">URL</th>
-                    <th class="py-2 px-3">Referrer</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for view in page_views %}
-                <tr class="border-t border-gray-700 hover:bg-gray-800">
-                    <td class="py-2 px-3">{{ view.timestamp|date:"H:i:s" }}</td>
-                    <td class="py-2 px-3 font-mono text-green-400">{{ view.visitor.pf_id|truncatechars:10 }}</td>
-                    <td class="py-2 px-3">{{ view.url }}</td>
-                    <td class="py-2 px-3">{{ view.referrer|default:"—" }}</td>
-                </tr>
-                {% endfor %}
-                <br>
-                <!-- Paginator -->
-                {% include 'core/partials/pagination.html' with page_views=page_views %}
-            </tbody>
-        </table>
-    </div>
+<div class="box mb-5">
+  {% include 'analytics/partials/site_chart.html' with site=site %}
 </div>
 
+<div class="columns is-multiline mb-5">
+  <div class="column is-half">
+    <div class="box">
+      <p class=" is-size-5 mb-1">Total Visitors</p>
+      <p class="has-text-success has-text-weight-bold is-size-3">{{ visitors|length }}</p>
+    </div>
+  </div>
+  <div class="column is-half">
+    <div class="box">
+      <p class=" is-size-5 mb-1">Recent Page Views</p>
+      <p class=" is-size-4">{{ page_views|length }}</p>
+    </div>
+  </div>
+</div>
 
-<!-- Analytics Script Snippet -->
-<div class="card bg-base-200 shadow-md mt-6">
-    <div class="card-body">
-        <h2 class="card-title text-white">Tracking Script</h2>
-        <p class="text-gray-400 mb-2">
-            Paste this snippet into the <code class="text-white">&lt;head&gt;</code> of your website to enable tracking:
-        </p>
+<div class="columns is-multiline mb-5">
+  <div class="column is-half">
+    <div class="box">
+      <h3 class="title is-6 ">📄 Top Pages</h3>
+      <ul>
+        {% for page in top_pages %}
+        <li class="is-flex is-justify-content-space-between is-size-7 ">
+          <span title="{{ page.url }}">{{ page.url|truncatechars:60 }}</span>
+          <span class="tag is-info is-light">{{ page.view_count }} views</span>
+        </li>
+        {% empty %}
+        <li class="">No data available.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
 
-        <div class="relative">
-            <pre class="bg-base-300 text-sm rounded-md p-4 overflow-x-auto text-green-200">
+  <div class="column is-half">
+    <div class="box">
+      <h3 class="title is-6 ">🌐 Top Referrers</h3>
+      <ul>
+        {% for ref in top_referrers %}
+        <li class="is-flex is-justify-content-space-between is-align-items-center is-size-7 ">
+          <div class="is-flex is-align-items-center">
+            <img src="{{ ref.referrer|favicon }}" alt="favicon" class="image is-16x16 mr-2" />
+            <span title="{{ ref.referrer }}">{{ ref.referrer|domain }}</span>
+          </div>
+          <span class="tag is-success is-light">{{ ref.count }} hits</span>
+        </li>
+        {% empty %}
+        <li class="">No referrer data available.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="mb-6">
+  <h3 class="title is-5 ">Recent Views</h3>
+  <a href="{% url 'analytics:download_csv' site.site_id %}" class="button is-small is-outlined mb-3">
+    Download as CSV
+  </a>
+
+  <div class="table-container">
+    <table class="table is-fullwidth is-striped is-hoverable is-size-7 ">
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>Visitor</th>
+          <th>URL</th>
+          <th>Referrer</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for view in page_views %}
+        <tr>
+          <td>{{ view.timestamp|date:"H:i:s" }}</td>
+          <td class="has-text-success is-family-monospace">{{ view.visitor.pf_id|truncatechars:10 }}</td>
+          <td>{{ view.url }}</td>
+          <td>{{ view.referrer|default:"—" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% include 'core/partials/pagination.html' with page_views=page_views %}
+</div>
+
+<div class="card has-background-dark">
+  <div class="card-content">
+    <h2 class="title is-5 ">Tracking Script</h2>
+    <p class=" mb-3">
+      Paste this snippet into the <code class="">&lt;head&gt;</code> of your website:
+    </p>
+
+    <div class="field">
+      <div class="control">
+        <pre class="has-background-black-ter has-text-success p-3 is-size-7">
 &lt;script src="{{ request.scheme }}://{{ request.get_host }}/pf.js" data-site="{{ site.site_id }}" defer&gt;&lt;/script&gt;
-            </pre>
-
-            <!-- Optional: Copy button (works well with Alpine.js or plain JS) -->
-            <button class="btn btn-xs btn-outline absolute top-2 right-2"
-                onclick="navigator.clipboard.writeText(`<script src='{{ request.scheme }}://{{ request.get_host }}/pf.js' data-site='{{ site.site_id }}' defer></script>`)">
-                Copy
-            </button>
-        </div>
-
+        </pre>
+      </div>
+      <div class="control mt-2">
+        <button class="button is-small is-outlined" onclick="navigator.clipboard.writeText(`<script src='{{ request.scheme }}://{{ request.get_host }}/pf.js' data-site='{{ site.site_id }}' defer></script>`)">
+          Copy Snippet
+        </button>
+      </div>
     </div>
+  </div>
 </div>
-
 {% endblock content %}

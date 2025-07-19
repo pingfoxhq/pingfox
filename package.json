@@ -1,6 +1,8 @@
 {
   "dependencies": {
     "@tailwindcss/cli": "^4.1.11",
+    "bulma": "^1.0.4",
+    "sass": "^1.89.2",
     "tailwindcss": "^4.1.11"
   },
   "devDependencies": {
@@ -9,6 +11,8 @@
   },
   "scripts": {
     "watch-css": "npx @tailwindcss/cli -i apps/core/static/src/input.css -o apps/core/static/build.css --watch",
-    "build-css": "npx @tailwindcss/cli -i apps/core/static/src/input.css -o apps/core/static/build.css"
+    "build-css": "npx @tailwindcss/cli -i apps/core/static/src/input.css -o apps/core/static/build.css",
+    "build-bulma": "sass --load-path=node_modules apps/core/static/bulma/input.scss apps/core/static/bulma/output.css",
+    "start": "npm run build-bulma -- --watch"
   }
 }

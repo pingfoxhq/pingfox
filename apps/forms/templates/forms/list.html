@@ -2,67 +2,80 @@
 {% block title %}Forms{% endblock %}
 
 {% block content %}
-<div class="flex items-center justify-between">
-
-    <h1 class="text-3xl font-semibold text-white mb-2">Your Forms ({{ current_team.forms.count }}/{{ max_forms }})</h1>
-    <a href="{% url 'forms:create' %}" class="btn btn-primary btn-sm">+ Create New Form</a>
+<div class="level mb-4">
+  <div class="level-left">
+    <h3 class="title is-3 ">Your Forms ({{ current_team.forms.count }}/{{ max_forms }})</h3>
+  </div>
+  <div class="level-right">
+    <a href="{% url 'forms:create' %}" class="button is-primary is-small">+ Create New Form</a>
+  </div>
 </div>
-<p class="text-sm text-gray-400 mb-8">
-    Manage all forms created by your team.
+
+<p class="subtitle  mb-5">
+  Manage all forms created by your team.
 </p>
+
 {% include 'core/partials/dashboard_tab.html' with active_tab="forms" %}
+
 {% if forms %}
-<div class="grid grid-cols-1 gap-6">
-    {% for form in forms %}
-    <div class="bg-base-200 p-5 rounded-xl border border-base-300 hover:border-primary transition-all duration-200">
-        <div class="flex justify-between items-center mb-2">
-            <div class="flex flex-col">
-                <a href="{% url 'forms:builder' form.slug %}" class="text-lg font-medium text-white hover:underline">
-                    {{ form.name }}
-                </a>
-                <div class="flex">
-                    <a href="{% url 'public_forms:public' form.slug %}" hx-boost="false">
-                        <span class="text-xs text-gray-500">/{{ form.slug }}</span>
-                    </a>
-                    <!-- Copy public form URL to clipboard -->
-                    <button class="btn btn-xs btn-ghost ml-2"
-                        x-on:click="navigator.clipboard.writeText('{{ request.build_absolute_uri }}{{ form.get_absolute_url }}')">
-                        📋
-                    </button>
-
-                </div>
+<div class="columns is-multiline">
+  {% for form in forms %}
+  <div class="column is-12">
+    <div class="box has-background-dark">
+      <div class="level is-mobile mb-2">
+        <div class="level-left">
+          <div>
+            <a href="{% url 'forms:builder' form.slug %}" class="is-size-5  has-text-weight-medium hover-underline">
+              {{ form.name }}
+            </a>
+            <div class="is-flex is-align-items-center mt-1">
+              <a href="{% url 'public_forms:public' form.slug %}" hx-boost="false">
+                <span class="is-size-7 ">/{{ form.slug }}</span>
+              </a>
+              <button class="button is-small is-text ml-2 px-2 py-0"
+                x-on:click="navigator.clipboard.writeText('{{ request.build_absolute_uri }}{{ form.get_absolute_url }}')">
+                📋
+              </button>
             </div>
-            {% if form.is_active %}
-            <span class="badge badge-success text-xs">Active</span>
-            {% else %}
-            <span class="badge badge-error text-xs">Inactive</span>
-            {% endif %}
+          </div>
         </div>
-        <div class="flex justify-between text-sm text-gray-400 mt-2">
-            <span>Created: {{ form.created_at|date:"M j, Y" }}</span>
-            <span>
-                <a href="{% url 'forms:submission_list' form.slug %}">
+        <div class="level-right">
+          {% if form.is_active %}
+          <span class="tag is-success is-light is-size-7">Active</span>
+          {% else %}
+          <span class="tag is-danger is-light is-size-7">Inactive</span>
+          {% endif %}
+        </div>
+      </div>
 
-                    {{ form.submissions.count|default:"0" }} Submissions
-                </a>
-            </span>
-        </div>
-        <a href="{% url 'forms:edit' form.slug %}" class="btn">Edit Info</a>
-        <a href="{% url 'forms:schema' form.slug %}" hx-boost="false" class="btn btn-secondary btn-xs">View Schema</a>
+      <div class="is-flex is-justify-content-space-between is-size-7  mb-3">
+        <span>Created: {{ form.created_at|date:"M j, Y" }}</span>
+        <span>
+          <a href="{% url 'forms:submission_list' form.slug %}" class="">
+            {{ form.submissions.count|default:"0" }} Submissions
+          </a>
+        </span>
+      </div>
+
+      <div class="buttons are-small">
+        <a href="{% url 'forms:edit' form.slug %}" class="button">Edit Info</a>
+        <a href="{% url 'forms:schema' form.slug %}" hx-boost="false" class="button is-info is-light">View Schema</a>
         {% if form.is_locked %}
-        <span class="badge badge-warning btn-xs">Frozen</span>
+        <span class="tag is-warning is-light">Frozen</span>
         {% else %}
-        <a href="{% url 'forms:builder' form.slug %}" class="btn btn-secondary btn-xs">Edit Builder</a>
-        <a href="{% url 'forms:freeze' form.slug %}" class="btn btn-error btn-xs">Freeze</a>
+        <a href="{% url 'forms:builder' form.slug %}" class="button is-info is-light">Edit Builder</a>
+        <a href="{% url 'forms:freeze' form.slug %}" class="button is-danger is-light">Freeze</a>
         {% endif %}
-        <a href="{% url 'forms:delete' form.slug %}" class="btn btn-error btn-xs">Delete</a>
+        <a href="{% url 'forms:delete' form.slug %}" class="button is-danger is-light">Delete</a>
+      </div>
     </div>
-    {% endfor %}
+  </div>
+  {% endfor %}
 </div>
 {% else %}
-<div class="text-center py-12 text-gray-400">
-    <p class="text-lg">You haven’t created any forms yet.</p>
-    <a href="{% url 'forms:create' %}" class="btn btn-outline mt-4">Create Your First Form</a>
+<div class="has-text-centered py-6 ">
+  <p class="is-size-5">You haven’t created any forms yet.</p>
+  <a href="{% url 'forms:create' %}" class="button mt-4">Create Your First Form</a>
 </div>
 {% endif %}
 {% endblock %}

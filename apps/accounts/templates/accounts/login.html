@@ -1,12 +1,20 @@
 {% extends 'base.html' %}
-{% load crispy_forms_tags %}
-{% block title %}Login{% endblock %}
+{% load bulma_tags %}
+{% block title %}
+Login to Your Account
+{% endblock %}
 
 {% block content %}
-{% include 'core/partials/create_form.html' with heading="Log in to your account" subtitle="Enter your credentials to continue" form=form button_text="Log in" %}
+<h1 class="title">Login</h1>
+<form method="post">
+    {{ form | bulma }}
+    {% csrf_token %}
+    <div class="field">
+        <button type="submit" class="button is-success">Login</button>
+    </div>
+    <div class="field">
+        <small>Don't have an Account? <a href="{% url 'accounts:register' %}">Sign Up</a></small>
+    </div>
+</form>
 
-<p class="mt-6 text-center text-sm text-gray-400">
-    Don't have an account?
-    <a href="{% url 'accounts:register' %}" class="font-medium fox-orange-text hover:underline">Sign up</a>
-</p>
 {% endblock content %}

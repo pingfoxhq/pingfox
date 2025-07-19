@@ -6,6 +6,7 @@ urlpatterns = [
     path("", views.team_index, name="index"),
     path("switch/", views.switch_team_view, name="switch"),
     path("create/", views.team_create, name="create"),
+    path("edit/<slug:slug>/", views.team_edit, name="edit"),
     path("list/", views.team_list, name="list"),
     path("transfer/<slug:slug>/", views.team_transfer_ownership, name="transfer_ownership"),
     path("<slug:slug>/", views.team_detail, name="detail"),

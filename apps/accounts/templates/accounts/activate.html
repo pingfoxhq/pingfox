@@ -4,11 +4,15 @@ Activate your account
 {% endblock %}
 {% block content %}
 {% include 'core/partials/create_form.html' with heading="Activate Your Account" subtitle="Please enter the activation code sent to your email to activate your account." form=form button_text="Activate" %}
+<p class="has-text-centered is-size-7 has-text-grey mt-6">
+  Need help?
+  <a href="#" class="has-text-weight-medium has-text-link hover:underline">
+    Contact Support
+  </a>
+  <br>
+  <a href="{% url 'accounts:resend_activation' %}" class="has-text-weight-medium has-text-link hover:underline">
+    Resend Activation Email
+  </a>
+</p>
 
-<p class="mt-6 text-center text-sm text-gray-400">
-            Need help?
-            <a href="" class="font-medium fox-orange-text hover:underline">
-                Contact Support 
-            </a>
-        </p>
 {% endblock content %}

@@ -16,7 +16,13 @@
     <!-- Header -->
     <header class="bg-fox-orange text-white shadow-md">
         <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <h1 class="text-2xl font-bold">PingFox</h1>
+            <h1 class="text-2xl font-bold">
+                <span>
+                    <img src="{% static 'img/logo.png' %}" alt="PingFox Logo"
+                        class="inline-block h-10 mr-2 p-2 bg-box-bg rounded shadow-lg">
+                </span>
+                PingFox
+            </h1>
             <nav class="space-x-6">
                 <a href="#features" class="hover:underline">Features</a>
                 <a href="#pricing" class="hover:underline">Pricing</a>
@@ -77,7 +83,7 @@
 
                 <h4 class="text-xl font-semibold my-2">{{ plan.name }}</h4>
                 <p class="mb-4">
-                        {{plan.description |default:"No description available."}}
+                    {{plan.description |default:"No description available."}}
                 </p>
                 <p class="text-3xl font-bold">₹{{ plan.price | stringformat:'d' }}/mo</p>
             </div>

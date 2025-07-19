@@ -1,6 +1,5 @@
 {% extends 'base.html' %}
-{% load crispy_forms_tags %}
-
+{% load bulma_tags %}
 {% block title %}
 Edit a Form
 {% endblock %}
@@ -8,14 +7,14 @@ Edit a Form
 {% block content %}
 <div class="flex items-center justify-between">
 
-    <h1 class="text-3xl font-semibold text-white mb-2">
+    <h3 class="title is-3 has-text-weight-bold text-white mb-2">
         Edit a Form
-    </h1>
-    <a href="{% url 'forms:list' %}" class="btn btn-sm">
+    </h3>
+    <a href="{% url 'forms:list' %}" class="button is-primary is-small">
         &leftarrow; Back to Forms List
     </a>
 </div>
-<p class="text-sm text-gray-400 mb-8">
+<p class="subtitle text-gray-400 mb-5">
     Edit the details of your form. You can change the name, and other settings.
 </p>
 {% include 'core/partials/dashboard_tab.html' with active_tab="forms" %}
@@ -27,7 +26,7 @@ Edit a Form
     <form method="post" action="{% url 'forms:style_update' form_obj.slug %}" enctype="multipart/form-data">
         {% csrf_token %}
         {{ style_form.media }}
-        {{ style_form | crispy }}
+        {{ style_form | bulma }}
         <button class="btn btn-primary" type="submit">Update Style</button>
     </form>
 </div>

@@ -1,17 +1,20 @@
 {% extends 'base.html' %}
+{% load bulma_tags %}
 {% block title %}
-Register
+Register an Account
 {% endblock %}
 
 {% block content %}
-{% include 'core/partials/create_form.html' with heading="Create an account" subtitle="Enter the basic info to get started" form=form button_text="Sign Up" %}
-<div class="mt-6 flex items-center justify-center">
-    <span class="text-gray-400 text-sm">or</span>
-    <a href="" class="ml-2 text-sm text-fox-orange hover:underline">Sign up with GitHub</a>
+<h1 class="title">Signup</h1>
+<form method="post">
+    {{ form | bulma }}
+    {% csrf_token %}
+    <div class="field">
+        <button type="submit" class="button is-success">Signup</button>
+    </div>
+    <div class="field">
+        <small>Already have an Account? <a href="{% url 'accounts:login' %}">Log In</a></small>
+    </div>
+</form>
 
-</div>
-<p class="mt-6 text-center text-sm text-gray-400">
-    Already have an account?
-    <a href="{% url 'accounts:login' %}" class="font-medium fox-orange-text hover:underline">Login</a>
-</p>
 {% endblock content %}

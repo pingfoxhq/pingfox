@@ -5,77 +5,80 @@ Your Sites
 {% endblock title %}
 
 {% block content %}
-<div class="flex items-center justify-between mb-6">
-  <h1 class="text-3xl font-semibold text-white">
-    Your Sites ({{ sites.count }}/{{ max_sites }})
-  </h1>
-  {% if can_create %}
-  <a href="{% url 'sites:create' %}" class="btn btn-primary btn-sm">+ Create New Site</a>
-  {% endif %}
+<div class="level mb-4">
+  <div class="level-left">
+    <h3 class="title is-3 ">Your Sites ({{ sites.count }}/{{ max_sites }})</h3>
+  </div>
+  <div class="level-right">
+    <a href="{% url 'sites:create' %}" class="button is-primary is-small">+ Create New Site</a>
+  </div>
 </div>
 
-<p class="text-sm text-gray-400 mb-8">
+<p class="subtitle  mb-5">
   Manage all sites created by your team.
 </p>
 
 {% include 'core/partials/dashboard_tab.html' with active_tab="sites" %}
 
 {% if sites %}
-<div class="grid grid-cols-1 gap-6">
+<div class="columns is-multiline">
   {% for site in sites %}
-  <div class="bg-base-200 p-5 rounded-xl border border-base-300 hover:shadow-lg transition-all duration-200">
-    <div class="flex justify-between items-start">
-      <div>
-        <a href="{% url 'sites:edit' site.site_id %}" class="text-lg font-semibold text-white hover:underline">
-          {{ site.name }} [{{ site.domain }}]
-        </a>
-        <p class="text-xs text-gray-500 mt-1">{{ site.site_id }}</p>
-        <div class="mt-2 space-x-2">
-          {% if site.is_verified %}
-          <span class="badge badge-success">Verified</span>
-          {% else %}
-          <span class="badge badge-warning">Unverified</span>
-          {% endif %}
-          <span class="badge {{ site.is_active|yesno:'badge-accent,badge-ghost' }}">
-            {{ site.is_active|yesno:"Active,Inactive" }}
-          </span>
+  <div class="column is-12">
+    <div class="box">
+      <div class="is-flex is-justify-content-space-between is-align-items-flex-start">
+        <div>
+          <a href="{% url 'sites:edit' site.site_id %}" class=" has-text-weight-semibold is-size-5">
+            {{ site.name }} [{{ site.domain }}]
+          </a>
+          <p class="is-size-7  mt-1">{{ site.site_id }}</p>
+          <div class="mt-2">
+            {% if site.is_verified %}
+              <span class="tag is-success">Verified</span>
+            {% else %}
+              <span class="tag is-warning">Unverified</span>
+            {% endif %}
+            <span class="tag {{ site.is_active|yesno:'is-info,is-light' }}">
+              {{ site.is_active|yesno:"Active,Inactive" }}
+            </span>
+          </div>
+        </div>
+
+        <div class="has-text-right is-size-7 ">
+          <p>Created: {{ site.created_at|date:"M j, Y" }}</p>
         </div>
       </div>
 
-      <div class="text-right text-sm text-gray-400">
-        <p>Created: {{ site.created_at|date:"M j, Y" }}</p>
+      <div class="mt-4 buttons are-small">
+        <a href="{% url 'sites:details' site.site_id %}" class="button is-link is-light">Details</a>
+        <a href="{% url 'sites:edit' site.site_id %}" class="button is-dark">Edit</a>
+        <a href="{% url 'sites:delete' site.site_id %}" class="button is-danger is-light">Delete</a>
+        {% if not site.is_verified %}
+        <a href="{% url 'sites:verify' site.site_id %}" class="button is-warning is-light">Verify</a>
+        {% endif %}
       </div>
-    </div>
 
-    <div class="mt-4 flex flex-wrap gap-2">
-      <a href="{% url 'sites:details' site.site_id %}" class="btn btn-accent btn-sm">Details</a>
-      <a href="{% url 'sites:edit' site.site_id %}" class="btn btn-neutral btn-sm">Edit</a>
-      <a href="{% url 'sites:delete' site.site_id %}" class="btn btn-error btn-sm">Delete</a>
       {% if not site.is_verified %}
-      <a href="{% url 'sites:verify' site.site_id %}" class="btn btn-warning btn-sm">Verify</a>
+      <div class="mt-4">
+        <p class="is-size-7 ">
+          To verify your site, this token should be placed at:
+          <code>~/.well-known/pingfox-verification.txt</code>
+        </p>
+        <div x-data="{ open: false }" class="mt-2">
+          <button @click="open = !open" class="button is-small is-light">Show Verification Token</button>
+          <div x-show="open" class="mt-2 p-2 is-size-7">
+            <pre>{{ site.verification_token }}</pre>
+          </div>
+        </div>
+      </div>
       {% endif %}
     </div>
-
-    {% if not site.is_verified %}
-    <div class="mt-4">
-      <p class="text-xs text-gray-500">
-        To verify your site, this token should be placed at:
-        <code class="text-xs">~/.well-known/pingfox-verification.txt</code>
-      </p>
-      <div x-data="{ open: false }" class="mt-2">
-        <button @click="open = !open" class="btn btn-xs btn-ghost">
-          Show Verification Token
-        </button>
-        <div x-show="open" class="mt-2 p-2 bg-base-300 rounded text-xs text-white">
-          <code>{{ site.verification_token }}</code>
-        </div>
-      </div>
-    </div>
-    {% endif %}
   </div>
   {% endfor %}
 </div>
 {% else %}
-<p class="text-gray-400 mt-4">No sites found. Create a new site to get started.</p>
+<div class="has-text-centered py-6 ">
+  <p class="is-size-5">You haven’t created any sites yet.</p>
+  <a href="{% url 'sites:create' %}" class="button mt-4">Create Your First Site</a>
+</div>
 {% endif %}
 {% endblock content %}

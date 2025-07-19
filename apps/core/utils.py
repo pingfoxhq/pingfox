@@ -25,3 +25,16 @@ def cors_enabled(func):
         return response
 
     return wrapper
+
+
+def is_htmx(request):
+    """
+    Check if the request is an HTMX request.
+    
+    Args:
+        request (HttpRequest): The Django request object.
+    
+    Returns:
+        bool: True if the request is an HTMX request, False otherwise.
+    """
+    return "HX-Request" in request.headers or "hx-request" in request.headers

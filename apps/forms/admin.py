@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Form, FormField, FormSubmission, FormStyle, models
+from .models import Form, FormField, FormSubmission, FormStyle
 from django.utils.html import format_html
 
 @admin.register(FormSubmission)

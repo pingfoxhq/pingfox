@@ -16,10 +16,10 @@ EXTEMPT_URLS = [
     "accounts:register",
     "accounts:resend_activation",
     "accounts:activate",
-    "home",
-    "onboarding",
-    "verification_token",
-    "home_unauth",
+    "core:home",
+    "core:onboarding",
+    "core:verification_token",
+    "core:home_unauth",
 ]
 
 

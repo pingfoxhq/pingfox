@@ -183,7 +183,7 @@ class PageView(models.Model):
         help_text=_("The visitor session associated with this page view.")
     )
     site = models.ForeignKey(
-        "sites.Site",
+        Site,
         on_delete=models.CASCADE,
         related_name="page_views",
         verbose_name=_("Site"),

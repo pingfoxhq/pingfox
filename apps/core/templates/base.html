@@ -12,7 +12,7 @@
     <!-- <link rel="stylesheet" href="{% static 'unpoly/unpoly.min.css' %}"> -->
     <script src="{{ PINGFOX_JS_SRC_URL }}" data-site='{{ PINGFOX_SITE_ID }}' defer></script>
 
-    {% include 'core/partials/favicon.html' %}
+    {% include 'core/islands/favicon.html' %}
 
     <title>
         {% block title %}
@@ -23,11 +23,11 @@
 
 <body hx-boost="true">
 
-    {% include 'core/partials/loader.html' %}
+    {% include 'core/islands/loader.html' %}
     {% include 'core/islands/navbar.html' %}
     <main class="container" up-main>
         <section class="section">
-            {% include 'core/partials/messages.html' %}
+            {% include 'core/islands/messages.html' %}
             {% block content %}{% endblock %}
         </section>
     </main>

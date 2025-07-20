@@ -1,0 +1,27 @@
+<div class="tabs is-boxed is-large mb-6">
+  <ul>
+    <li class="{% if active_tab == 'sites' %}is-active{% endif %}">
+      <a href="{% url 'sites:index' %}">
+        <span class="has-text-weight-semibold">Sites</span>
+      </a>
+    </li>
+
+    <li class="{% if active_tab == 'forms' %}is-active{% endif %}">
+      <a href="{% url 'forms:index' %}">
+        <span class="has-text-weight-semibold">Forms</span>
+      </a>
+    </li>
+
+    <li class="{% if active_tab == 'teams' %}is-active{% endif %}">
+      <a href="{% url 'teams:index' %}">
+        <span class="has-text-weight-semibold">Teams</span>
+      </a>
+    </li>
+
+    <li class="{% if active_tab == 'accounts' %}is-active{% endif %}">
+      <a href="{% url 'accounts:index' %}">
+        <span class="has-text-weight-semibold">Accounts</span>
+      </a>
+    </li>
+  </ul>
+</div>

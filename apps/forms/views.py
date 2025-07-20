@@ -14,7 +14,7 @@ from apps.forms.utils import (
     create_form_from_form_model,
 )
 
-from apps.teams.utils import get_current_team
+from apps.accounts.utils import get_current_team
 
 
 @login_required

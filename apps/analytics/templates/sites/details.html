@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load ref_helpers %}
+
+{% block title %}
+Site Details – {{ site.name }}
+{% endblock title %}
+
+{% block content %}
+<div class="level mb-5">
+  <div class="level-left">
+    <div class="level-item">
+      <div>
+        <h1 class="title ">{{ site.name }}</h1>
+        <p class="subtitle is-size-7 ">
+          Site ID: <span class=" is-family-monospace">{{ site.site_id }}</span>
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="level-right">
+    <div class="level-item">
+      <a href="{% url 'analytics:sites_list' %}" class="button is-small is-outlined">← Back to Sites List</a>
+    </div>
+  </div>
+</div>
+
+{% include 'core/islands/tabs.html' with active_tab="sites" %}
+
+<div class="box mb-5">
+  {% include 'analytics/islands/chart.html' %}
+</div>
+
+<div class="columns is-multiline mb-5">
+  <div class="column is-half">
+    <div class="box">
+      <p class="is-size-5 mb-1">Total Visitors</p>
+      <p class="has-text-success has-text-weight-bold is-size-3">{{ visitors|length }}</p>
+    </div>
+  </div>
+  <div class="column is-half">
+    <div class="box">
+      <p class="is-size-5 mb-1">Recent Page Views</p>
+      <p class="is-size-4">{{ page_views|length }}</p>
+    </div>
+  </div>
+</div>
+
+<div class="columns is-multiline mb-5">
+  <div class="column is-half">
+    <div class="box">
+      <h3 class="title is-6 ">📄 Top Pages</h3>
+      <ul>
+        {% for page in top_pages %}
+        <li class="is-flex is-justify-content-space-between is-size-7 ">
+          <span title="{{ page.url }}">{{ page.url|truncatechars:60 }}</span>
+          <span class="tag is-info is-light">{{ page.view_count }} views</span>
+        </li>
+        {% empty %}
+        <li class="">No data available.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  <div class="column is-half">
+    <div class="box">
+      <h3 class="title is-6 ">🌐 Top Referrers</h3>
+      <ul>
+        {% for ref in top_referrers %}
+        <li class="is-flex is-justify-content-space-between is-align-items-center is-size-7 ">
+          <div class="is-flex is-align-items-center">
+            <img src="{{ ref.referrer|favicon }}" alt="favicon" class="image is-16x16 mr-2" />
+            <span title="{{ ref.referrer }}">{{ ref.referrer|domain }}</span>
+          </div>
+          <span class="tag is-success is-light">{{ ref.count }} hits</span>
+        </li>
+        {% empty %}
+        <li class="">No referrer data available.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="mb-6">
+  <h3 class="title is-5 ">Recent Views</h3>
+  <a href="{% url 'analytics:download_csv' site.site_id %}" class="button is-small is-outlined mb-3">
+    Download as CSV
+  </a>
+
+  <div class="table-container">
+    <table class="table is-fullwidth is-striped is-hoverable is-size-7">
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>Visitor</th>
+          <th>URL</th>
+          <th>Referrer</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for view in page_views %}
+        <tr>
+          <td>{{ view.timestamp|date:"H:i:s" }}</td>
+          <td class="has-text-success is-family-monospace">{{ view.visitor.pf_id|truncatechars:10 }}</td>
+          <td>{{ view.url }}</td>
+          <td>{{ view.referrer|default:"—" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% include 'core/partials/pagination.html' with page_views=page_views %}
+</div>
+
+<div class="card has-background-dark">
+  <div class="card-content">
+    <h2 class="title is-5 ">Tracking Script</h2>
+    <p class=" mb-3">
+      Paste this snippet into the <code class="">&lt;head&gt;</code> of your website:
+    </p>
+
+    <div class="field">
+      <div class="control">
+        <pre class="has-background-black-ter has-text-success p-3 is-size-7">
+&lt;script src="{{ request.scheme }}://{{ request.get_host }}/pf.js" data-site="{{ site.site_id }}" defer&gt;&lt;/script&gt;
+        </pre>
+      </div>
+      <div class="control mt-2">
+        <button class="button is-small is-outlined" onclick="navigator.clipboard.writeText(`<script src='{{ request.scheme }}://{{ request.get_host }}/pf.js' data-site='{{ site.site_id }}' defer></script>`)">
+          Copy Snippet
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}

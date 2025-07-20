@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from apps.teams.utils import get_user_teams
+from apps.accounts.utils import get_user_teams
 from django.http import HttpResponse
 from django.conf import settings
 
@@ -10,7 +10,7 @@ def home(request):
     Render the home page of the application.
     """
     if request.user.is_authenticated:
-        return redirect("dashboard:index")
+        return redirect("analytics:index")
     return render(request, "core/home.html")
 
 

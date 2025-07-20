@@ -1,12 +1,32 @@
-def generate_activation_key(length=40):
+from .models import Team
+from apps.core.utils import get_or_null
+from django.shortcuts import redirect
+
+def switch_team(request, team_id):
     """
-    Generates a secure random activation key of the specified length.
-    
-    Args:
-        length (int): The desired length of the activation key. Default is 40.
-    
-    Returns:
-        str: A secure random activation key.
+    Switch the current team context for the user.
     """
-    import secrets
-    return secrets.token_urlsafe(length)[:length]
+    team = get_or_null(Team, id=team_id, members__in=[request.user])
+    request.session['current_team_id'] = team.id
+
+
+def get_current_team(request):
+    """
+    Get the current team context for the user.
+    """
+    team_id = request.session.get('current_team_id')
+    if team_id:
+        return get_or_null(Team, id=team_id, members__in=[request.user])
+    else:
+        team  = get_user_teams(request).first()
+        if team:
+            request.session['current_team_id'] = team.id
+            return team
+        return redirect('teams:create')
+
+
+def get_user_teams(request):
+    """
+    Get all teams associated with the user.
+    """
+    return request.user.teams.all() if request.user.is_authenticated else []

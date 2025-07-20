@@ -2,7 +2,7 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save, pre_delete
 from apps.forms.models import Form, FormStyle
 from apps.analytics.models import PageView, VisitorSession
-from apps.sites.models import Site
+from apps.analytics.models import Site
 from django.conf import settings
 
 

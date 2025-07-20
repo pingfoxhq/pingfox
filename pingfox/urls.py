@@ -7,13 +7,10 @@ urlpatterns = [
     path("", include("apps.core.urls")),
     path("", include("apps.analytics.script_urls")),
     path("api/", include("apps.analytics.api_urls")),
-    path("dashboard/", include("apps.dashboard.urls")),
     path("accounts/", include("apps.accounts.urls")),
     path("analytics/", include("apps.analytics.urls")),
-    path("sites/", include("apps.sites.urls")),
     path("forms/", include("apps.forms.urls")),
     path("f/", include("apps.forms.public_urls")),
-    path("teams/", include("apps.teams.urls")),
     path("admin/", admin.site.urls),
 ]
 

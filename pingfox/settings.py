@@ -70,18 +70,15 @@ INSTALLED_APPS = [
     "apps.core.apps.CoreConfig",
     "apps.accounts.apps.AccountsConfig",
     "apps.billing.apps.BillingConfig",
-    "apps.sites.apps.SitesConfig",
     "apps.forms.apps.FormsConfig",
-    "apps.dashboard.apps.DashboardConfig",
     "apps.analytics.apps.AnalyticsConfig",
-    "apps.teams.apps.TeamsConfig",
 ]
 
 
 LOGIN_URL = "accounts:login"
 LOGOUT_URL = "accounts:logout"
-LOGOUT_REDIRECT_URL = "home"
-LOGIN_REDIRECT_URL = "dashboard:index"
+LOGOUT_REDIRECT_URL = "core:home"
+LOGIN_REDIRECT_URL = "core:home"
 
 
 MIDDLEWARE = [
@@ -127,8 +124,8 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "apps.billing.context_processors.pricing_plans",
-                "apps.teams.context_processors.team_context_processor",
                 "apps.core.context_processors.site_context_processor",
+                "apps.accounts.context_processors.team_context_processor",
             ],
         },
     },

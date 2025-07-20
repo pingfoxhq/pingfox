@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 import secrets
 from django_resized import ResizedImageField
 from colorfield.fields import ColorField
-from apps.teams.models import Team
+from apps.accounts.models import Team
 from django.utils.text import slugify
 from django.core.exceptions import ValidationError
 from apps.analytics.models import VisitorSession
@@ -24,11 +24,12 @@ def generate_auth_key(length=40):
         key = secrets.token_urlsafe(length)[:length]
         if not Form.objects.filter(auth_key=key).exists():
             return key
-        
+
+
 def generate_slug():
     """
     Generates a unique slug for a form.
-    
+
     - Uses `secrets` to ensure uniqueness.
     - Slugs are URL-safe and suitable for use in URLs.
     """
@@ -91,7 +92,9 @@ class Form(models.Model):
         blank=True,
         null=True,
         verbose_name=_("Site ID"),
-        help_text=_("The ID of the site where this form is hosted, entered if analytics are enabled."),
+        help_text=_(
+            "The ID of the site where this form is hosted, entered if analytics are enabled."
+        ),
     )
     authentication_required = models.BooleanField(
         default=False,
@@ -118,9 +121,7 @@ class Form(models.Model):
     allow_multiple_submissions = models.BooleanField(
         default=True,
         verbose_name=_("Allow Multiple Submissions"),
-        help_text=_(
-            "Indicates whether users can submit this form multiple times."
-        ),
+        help_text=_("Indicates whether users can submit this form multiple times."),
     )
 
     button_text = models.CharField(
@@ -165,7 +166,6 @@ class Form(models.Model):
             models.Index(fields=["owner"]),
         ]
 
-
     def save(self, *args, **kwargs):
         # Check if the owner is in the team
         if not self.owner in self.team.members.all():
@@ -178,9 +178,8 @@ class Form(models.Model):
                 slug = f"{base_slug}-{counter}"
                 counter += 1
             self.slug = slug
-            
-        super().save(*args, **kwargs)
 
+        super().save(*args, **kwargs)
 
 
 class FormStyle(models.Model):
@@ -251,7 +250,6 @@ class FormStyle(models.Model):
         verbose_name=_("Custom CSS"),
         help_text=_("Custom CSS styles for the form."),
     )
-    
 
     def __str__(self):
         return f"Style for {self.form.name}"
@@ -265,6 +263,7 @@ class FormStyle(models.Model):
         Returns a human-readable display of the font family.
         """
         return dict(self.FONT_CHOICES).get(self.font_family, self.font_family)
+
 
 class FormField(models.Model):
     FIELD_TYPES = [

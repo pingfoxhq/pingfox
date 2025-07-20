@@ -3,9 +3,10 @@
 Activate your account
 {% endblock %}
 {% block content %}
-{% include 'core/partials/create_form.html' with heading="Resend Activation Email" subtitle="Please enter your email address to resend the activation email." form=form button_text="Resend" %}
+{% include 'core/islands/form.html' with heading="Resend Activation Email" subtitle="Please enter your email address to resend the activation email." form=form button_text="Resend" %}
 <p class="has-text-centered is-size-7 has-text-grey mt-6">
   Need help?
+  <!-- :TODO: -->
   <a href="#" class="has-text-weight-medium has-text-link hover:underline">
     Contact Support
   </a>

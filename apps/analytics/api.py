@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from .models import VisitorSession, PageView
 import uuid
-from apps.sites.models import Site
+from apps.analytics.models import Site
 import json
 from django.contrib.auth.decorators import login_required
 from apps.analytics.services import get_site_analytics

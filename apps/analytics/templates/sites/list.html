@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Your Sites
+{% endblock title %}
+
+{% block content %}
+<div class="level mb-4">
+  <div class="level-left">
+    <h3 class="title is-3 ">Your Sites ({{ sites.count }}/{{ max_sites }})</h3>
+  </div>
+  <div class="level-right">
+    <a href="{% url 'analytics:sites_create' %}" class="button is-primary is-small">+ Create New Site</a>
+  </div>
+</div>
+
+<p class="subtitle mb-5">
+  Manage all sites created by your team.
+</p>
+
+{% include 'core/islands/tabs.html' with active_tab="sites" %}
+
+{% if sites %}
+<div class="columns is-multiline">
+  {% for site in sites %}
+  <div class="column is-12">
+    <div class="box">
+      <div class="is-flex is-justify-content-space-between is-align-items-flex-start">
+        <div>
+          <a href="{% url 'analytics:sites_edit' site.site_id %}" class=" has-text-weight-semibold is-size-5">
+            {{ site.name }} [{{ site.domain }}]
+          </a>
+          <p class="is-size-7  mt-1">{{ site.site_id }}</p>
+          <div class="mt-2">
+            {% if site.is_verified %}
+              <span class="tag is-success">Verified</span>
+            {% else %}
+              <span class="tag is-warning">Unverified</span>
+            {% endif %}
+            <span class="tag {{ site.is_active|yesno:'is-info,is-light' }}">
+              {{ site.is_active|yesno:"Active,Inactive" }}
+            </span>
+          </div>
+        </div>
+
+        <div class="has-text-right is-size-7 ">
+          <p>Created: {{ site.created_at|date:"M j, Y" }}</p>
+        </div>
+      </div>
+
+      <div class="mt-4 buttons are-small">
+        <a href="{% url 'analytics:sites_details' site.site_id %}" class="button is-link is-light">Details</a>
+        <a href="{% url 'analytics:sites_edit' site.site_id %}" class="button is-dark">Edit</a>
+        <a href="{% url 'analytics:sites_delete' site.site_id %}" class="button is-danger is-light">Delete</a>
+        {% if not site.is_verified %}
+        <a href="{% url 'analytics:sites_verify' site.site_id %}" class="button is-warning is-light">Verify</a>
+        {% endif %}
+      </div>
+
+      {% if not site.is_verified %}
+      <div class="mt-4">
+        <p class="is-size-7 ">
+          To verify your site, this token should be placed at:
+          <code>~/.well-known/pingfox-verification.txt</code>
+        </p>
+        <div x-data="{ open: false }" class="mt-2">
+          <button @click="open = !open" class="button is-small is-light">Show Verification Token</button>
+          <div x-show="open" class="mt-2 p-2 is-size-7">
+            <pre>{{ site.verification_token }}</pre>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="has-text-centered py-6 ">
+  <p class="is-size-5">You haven’t created any sites yet.</p>
+  <a href="{% url 'analytics:sites_create' %}" class="button mt-4">Create Your First Site</a>
+</div>
+{% endif %}
+{% endblock content %}

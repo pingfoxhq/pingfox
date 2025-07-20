@@ -1,4 +1,3 @@
-# Send user activation email after registration
 import dramatiq
 from django.conf import settings
 from django.core.mail import send_mail

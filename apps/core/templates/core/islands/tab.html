@@ -1,8 +1,8 @@
 <div class="tabs is-boxed is-large mb-6">
   <ul>
-    <li class="{% if active_tab == 'sites' %}is-active{% endif %}">
-      <a href="{% url 'sites:index' %}">
-        <span class="has-text-weight-semibold">Sites</span>
+    <li class="{% if active_tab == 'analytics' %}is-active{% endif %}">
+      <a href="{% url 'analytics:index' %}">
+        <span class="has-text-weight-semibold">Analytics</span>
       </a>
     </li>
 
@@ -13,7 +13,7 @@
     </li>
 
     <li class="{% if active_tab == 'teams' %}is-active{% endif %}">
-      <a href="{% url 'teams:index' %}">
+      <a href="{% url 'accounts:teams_list' %}">
         <span class="has-text-weight-semibold">Teams</span>
       </a>
     </li>

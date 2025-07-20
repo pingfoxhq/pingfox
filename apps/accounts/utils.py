@@ -22,7 +22,7 @@ def get_current_team(request):
         if team:
             request.session['current_team_id'] = team.id
             return team
-        return redirect('teams:create')
+        return redirect('accounts:teams_create')
 
 
 def get_user_teams(request):

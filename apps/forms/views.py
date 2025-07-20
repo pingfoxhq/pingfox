@@ -10,7 +10,6 @@ from django.http import HttpResponseBadRequest, JsonResponse, HttpResponse
 from django.contrib import messages
 from apps.forms.utils import (
     convert_form_to_schema,
-    create_form_class_from_schema,
     create_form_from_form_model,
 )
 
@@ -80,7 +79,11 @@ def form_edit(request, slug):
         messages.success(request, "Form updated successfully.")
         return redirect("forms:list")
 
-    return render(request, "forms/edit.html", {"form": form_form, "style_form": style_form, "form_obj": form})
+    return render(
+        request,
+        "forms/edit.html",
+        {"form": form_form, "style_form": style_form, "form_obj": form},
+    )
 
 
 @login_required
@@ -96,7 +99,7 @@ def form_delete(request, slug):
         messages.success(request, "Form deleted successfully.")
         return redirect("forms:list")
     form_class = create_form_from_form_model(form)
-    return render(request, "forms/delete.html", {"form": form_class })
+    return render(request, "forms/delete.html", {"form": form_class})
 
 
 @login_required
@@ -109,7 +112,9 @@ def form_builder(request, slug):
 
     if form.is_locked:
         messages.error(request, "Form is locked and cannot be edited.")
-        return redirect("forms:list",)
+        return redirect(
+            "forms:list",
+        )
 
     ui = create_form_from_form_model(form)
     if request.method == "POST":
@@ -261,6 +266,7 @@ def form_public_view(request, slug):
         },
     )
 
+
 @require_POST
 def form_submit_view(request, slug):
     form_obj = get_object_or_404(Form, slug=slug)
@@ -281,12 +287,15 @@ def form_submit_view(request, slug):
         if form_obj.redirect_url:
             return redirect(form_obj.redirect_url)
         return render(request, "forms/thank_you.html", {"form_obj": form_obj})
-    return render(request, "forms/public_form.html", {
-        "form_obj": form_obj,
-        "form": form,
-        "errors": form.errors,
-    })
-
+    return render(
+        request,
+        "forms/public_form.html",
+        {
+            "form_obj": form_obj,
+            "form": form,
+            "errors": form.errors,
+        },
+    )
 
 
 @login_required
@@ -300,7 +309,6 @@ def form_schema(request, slug):
     return JsonResponse(schema, safe=False)
 
 
-
 @login_required
 def freeze_form(request, slug):
     """
@@ -312,7 +320,7 @@ def freeze_form(request, slug):
     if form.is_locked:
         messages.error(request, "Form is already locked.")
         return redirect("forms:editor", slug=slug)
-    
+
     if request.method == "POST":
         form.is_locked = True
         form.save()
@@ -335,11 +343,15 @@ def submission_table_view(request, slug):
             all_keys.update(s.data.keys())
         field_labels = sorted(all_keys)
 
-    return render(request, "forms/submissions_table.html", {
-        "form": form,
-        "submissions": submissions,
-        "field_labels": field_labels,
-    })
+    return render(
+        request,
+        "forms/submissions_table.html",
+        {
+            "form": form,
+            "submissions": submissions,
+            "field_labels": field_labels,
+        },
+    )
 
 
 @login_required

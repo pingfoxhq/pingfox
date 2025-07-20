@@ -121,15 +121,15 @@ class Site(models.Model):
         verbose_name=_("Last Indexed"),
         help_text=_("The date and time when the site was last indexed for content."),
     )
-    # form = models.ForeignKey(
-    #     Form,
-    #     on_delete=models.CASCADE,
-    #     null=True,
-    #     blank=True,
-    #     related_name="sites",
-    #     verbose_name=_("Form"),
-    #     help_text=_("The form associated with this site, if any."),
-    # )
+    form = models.ForeignKey(
+        "forms.Form",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="sites",
+        verbose_name=_("Form"),
+        help_text=_("The form associated with this site, if any."),
+    )
          
 
     class Meta:

@@ -48,7 +48,7 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            return redirect("sites:index")
+            return redirect("core:home")
 
     return render(request, "accounts/login.html", {"form": form})
 
@@ -58,7 +58,7 @@ def logout_view(request):
     Handle user logout.
     """
     logout(request)
-    return redirect("home")
+    return redirect("core:home")
 
 
 def register_view(request):
@@ -186,7 +186,7 @@ def team_create(request):
         TeamMember.objects.create(user=request.user, team=team, role="admin")
         request.session["current_team_id"] = team.id
         messages.success(request, "Team created successfully!")
-        return redirect("dashboard:index")
+        return redirect("analytics:index")
     return render(request, "teams/create.html", {"form": form})
 
 
@@ -198,7 +198,7 @@ def team_list(request):
     teams = get_user_teams(request)
     if not teams:
         messages.info(request, "You are not a member of any teams.")
-        return redirect("teams:create")
+        return redirect("accounts:teams_create")
     current_team = get_current_team(request)
     return render(
         request, "teams/list.html", {"teams": teams, "current_team": current_team}
@@ -206,12 +206,12 @@ def team_list(request):
 
 
 @login_required
-def team_detail(request, slug):
+def team_details(request, slug):
     """
     View details of a specific team.
     """
     team = get_object_or_404(Team, slug=slug, members=request.user)
-    return render(request, "teams/detail.html", {"team": team})
+    return render(request, "teams/details.html", {"team": team})
 
 
 @login_required
@@ -227,7 +227,7 @@ def team_transfer_ownership(request, slug):
             new_owner = User.objects.get(username=new_owner_username)
             team.transfer_ownership(new_owner)
             messages.success(request, "Ownership transferred successfully!")
-            return redirect("teams:detail", slug=team.slug)
+            return redirect("accounts:teams_details", slug=team.slug)
         except User.DoesNotExist:
             messages.error(request, "User does not exist.")
     return render(request, "teams/transfer.html", {"form": form, "team": team})
@@ -258,5 +258,5 @@ def team_edit(request, slug):
     if request.method == "POST" and form.is_valid():
         form.save()
         messages.success(request, "Team details updated successfully!")
-        return redirect("teams:detail", slug=team.slug)
+        return redirect("accounts:teams_details", slug=team.slug)
     return render(request, "teams/edit.html", {"form": form, "team": team})

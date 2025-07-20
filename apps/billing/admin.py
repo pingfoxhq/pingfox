@@ -1,28 +1,7 @@
 from django.contrib import admin
-from .models import Plan, PlanFeature
+from .models import Plan, PlanFeature, RedeemCode, generate_redeem_code, CodeRedemption
 from django.utils.html import format_html
-# This dictionary contains the default features for new plans.
-# It is used to ensure that every plan has a consistent set of features.
-# By default, these features are for the "Free" plan.
-DEFAULT_FEATURES = {
-    "is_pro": "false",
-    "sites_limit": "1",
-    "pageviews": "10000",
-    "forms_enabled": "true",
-    "forms_limit": "3",
-    "webhooks": "true",
-    "wenhooks_limit": "3", # Same as forms_limit
-    "script_badge": "false",
-    "api_access": "true",
-    "data_retention_days": "30",
-    "import_enabled": "true",
-    "export_enabled": "true",
-    "backend_analytics": "false",
-    "custom_domain": "false",
-    "form_attachments": "false",
-    "limit_reset_day": "1",
-}
-
+from apps.billing.seed import DEFAULT_FEATURES
 
 
 class PlanFeatureInline(admin.TabularInline):
@@ -34,7 +13,6 @@ class PlanFeatureInline(admin.TabularInline):
     readonly_fields = ("key",)
     verbose_name = "Feature"
     verbose_name_plural = "Plan Features"
-
 
 
 @admin.register(Plan)
@@ -58,24 +36,29 @@ class PlanAdmin(admin.ModelAdmin):
     actions = ["add_default_features"]
     readonly_fields = ("created_at",)
     fieldsets = (
-        (None, {
-            "fields": (
-                "name",
-                "slug",
-                "price",
-                "description",
-                "is_active",
-                "visible",
-                "highlighted",
-                "ranking",
-            )
-        }),
-        ("Advanced Options", {
-            "classes": ("collapse",),
-            "fields": ("created_at", "is_base_plan"),
-            "description": "These options are for advanced users. Use with caution."
-
-        }),
+        (
+            None,
+            {
+                "fields": (
+                    "name",
+                    "slug",
+                    "price",
+                    "description",
+                    "is_active",
+                    "visible",
+                    "highlighted",
+                    "ranking",
+                )
+            },
+        ),
+        (
+            "Advanced Options",
+            {
+                "classes": ("collapse",),
+                "fields": ("created_at", "is_base_plan"),
+                "description": "These options are for advanced users. Use with caution.",
+            },
+        ),
     )
 
     @admin.display(description="Features")
@@ -86,12 +69,12 @@ class PlanAdmin(admin.ModelAdmin):
         features = obj.features.all()
         if not features:
             return "No features defined"
-        
+
         feature_list = "<ul>"
         for feature in features:
             feature_list += f"<li><strong>{feature.key}:</strong> {feature.value}</li>"
         feature_list += "</ul>"
-        
+
         return format_html(feature_list)
 
     def save_related(self, request, form, formsets, change):
@@ -108,4 +91,32 @@ class PlanAdmin(admin.ModelAdmin):
     def add_default_features(modeladmin, request, queryset):
         for plan in queryset:
             for key, value in DEFAULT_FEATURES.items():
-                PlanFeature.objects.get_or_create(plan=plan, key=key, defaults={"value": value})
+                PlanFeature.objects.get_or_create(
+                    plan=plan, key=key, defaults={"value": value}
+                )
+
+
+class CodeRedemptionInline(admin.TabularInline):
+    model = CodeRedemption
+    extra = 0
+    readonly_fields = ("redeemed_at",)
+    fields = ("redeem_code", "team", "redeemed_at")
+    autocomplete_fields = ("team",)
+    verbose_name = "Redeem Code"
+    verbose_name_plural = "Redeem Codes"
+
+
+@admin.register(RedeemCode)
+class RedeemCodeAdmin(admin.ModelAdmin):
+    list_display = ("code", "created_at")
+    search_fields = ("code", "plan__name")
+    fields = ("code", "description", "plan", "created_at")
+    readonly_fields = ("created_at",)
+    ordering = ("-created_at",)
+    autocomplete_fields = ("plan",)
+    inlines = [CodeRedemptionInline]
+
+    def save_model(self, request, obj, form, change):
+        if not obj.code:
+            obj.code = generate_redeem_code()
+        super().save_model(request, obj, form, change)

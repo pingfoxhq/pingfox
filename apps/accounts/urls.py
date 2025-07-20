@@ -16,5 +16,5 @@ urlpatterns = [
     path("edit/<slug:slug>/", views.team_edit, name="teams_edit"),
     path("list/", views.team_list, name="teams_list"),
     path("transfer/<slug:slug>/", views.team_transfer_ownership, name="teams_transfer_ownership"),
-    path("<slug:slug>/", views.team_detail, name="teams_detail"),
+    path("<slug:slug>/", views.team_details, name="teams_details"),
 ]

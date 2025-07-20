@@ -1,18 +1,27 @@
+import uuid, json
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
-from .models import VisitorSession, PageView
-import uuid
-from apps.analytics.models import Site
-import json
+from apps.analytics.models import VisitorSession, PageView, Site
 from django.contrib.auth.decorators import login_required
 from apps.analytics.services import get_site_analytics
 from apps.core.utils import cors_enabled
 
 
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from .serializers import AnalyticsChartQuerySerializer
+
+
 @csrf_exempt
 @cors_enabled
 def collect_data(request):
+    """
+    Collect analytics data from the client-side and store it in the database.
+    This endpoint is designed to be called by the client-side JavaScript code.
+    It expects a POST request with JSON data containing the analytics information.
+    """
     if request.method == "POST":
         data = json.loads(request.body.decode("utf-8")) if request.body else {}
         pf_id = data.get("pf_id")
@@ -53,12 +62,21 @@ def collect_data(request):
         )
 
 
-@login_required
-def site_chart_data_api(request, site_id):
+class AnalyticsChartDataAPI(APIView):
     """
-    API endpoint to get site analytics data for charts.
+    API endpoint to get analytics chart data.
     """
-    site = get_object_or_404(Site, site_id=site_id)
-    range = request.GET.get("range", "daily")
-    data = get_site_analytics(site, range)
-    return JsonResponse(data, safe=False, status=200)
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, format=None):
+        """
+        API endpoint to get analytics chart data.
+        """
+        serializer = AnalyticsChartQuerySerializer(data=request.query_params)
+        serializer.is_valid(raise_exception=True)
+        site_id = serializer.validated_data["site_id"]
+        range = serializer.validated_data["range"]
+
+        site = get_object_or_404(Site, site_id=site_id)
+        data = get_site_analytics(site, range)
+        return Response(data, status=200)

@@ -12,7 +12,7 @@ Site Details – {{ site.name }}
     <div class="level-item">
       <div>
         <h1 class="title ">{{ site.name }}</h1>
-        <p class="subtitle is-size-7 ">
+        <p class="subtitle is-6 mt-2">
           Site ID: <span class=" is-family-monospace">{{ site.site_id }}</span>
         </p>
       </div>
@@ -20,14 +20,14 @@ Site Details – {{ site.name }}
   </div>
   <div class="level-right">
     <div class="level-item">
-      <a href="{% url 'analytics:sites_list' %}" class="button is-small is-outlined">← Back to Sites List</a>
+      <a href="{% url 'analytics:index' %}" class="button is-small">← Back to Analytics</a>
     </div>
   </div>
 </div>
 
-{% include 'core/islands/tabs.html' with active_tab="sites" %}
+{% include 'core/islands/tab.html' with active_tab="analytics" %}
 
-<div class="box mb-5">
+<div class="box mb-5 has-background-black">
   {% include 'analytics/islands/chart.html' %}
 </div>
 
@@ -52,9 +52,9 @@ Site Details – {{ site.name }}
       <h3 class="title is-6 ">📄 Top Pages</h3>
       <ul>
         {% for page in top_pages %}
-        <li class="is-flex is-justify-content-space-between is-size-7 ">
+        <li class="is-flex is-justify-content-space-between is-7 mb-2">
           <span title="{{ page.url }}">{{ page.url|truncatechars:60 }}</span>
-          <span class="tag is-info is-light">{{ page.view_count }} views</span>
+          <span class="tag is-info">{{ page.view_count }} views</span>
         </li>
         {% empty %}
         <li class="">No data available.</li>
@@ -68,12 +68,12 @@ Site Details – {{ site.name }}
       <h3 class="title is-6 ">🌐 Top Referrers</h3>
       <ul>
         {% for ref in top_referrers %}
-        <li class="is-flex is-justify-content-space-between is-align-items-center is-size-7 ">
+        <li class="is-flex is-justify-content-space-between is-align-items-center is-7 mb-2">
           <div class="is-flex is-align-items-center">
             <img src="{{ ref.referrer|favicon }}" alt="favicon" class="image is-16x16 mr-2" />
             <span title="{{ ref.referrer }}">{{ ref.referrer|domain }}</span>
           </div>
-          <span class="tag is-success is-light">{{ ref.count }} hits</span>
+          <span class="tag is-success">{{ ref.count }} hits</span>
         </li>
         {% empty %}
         <li class="">No referrer data available.</li>
@@ -85,7 +85,7 @@ Site Details – {{ site.name }}
 
 <div class="mb-6">
   <h3 class="title is-5 ">Recent Views</h3>
-  <a href="{% url 'analytics:download_csv' site.site_id %}" class="button is-small is-outlined mb-3">
+  <a href="{% url 'analytics:sites_download_csv' site.site_id %}" class="button is-small is-outlined mb-3">
     Download as CSV
   </a>
 
@@ -112,10 +112,10 @@ Site Details – {{ site.name }}
     </table>
   </div>
 
-  {% include 'core/partials/pagination.html' with page_views=page_views %}
+  {% include 'core/islands/pagination.html' with page_views=page_views %}
 </div>
 
-<div class="card has-background-dark">
+<div class="card">
   <div class="card-content">
     <h2 class="title is-5 ">Tracking Script</h2>
     <p class=" mb-3">
@@ -124,7 +124,7 @@ Site Details – {{ site.name }}
 
     <div class="field">
       <div class="control">
-        <pre class="has-background-black-ter has-text-success p-3 is-size-7">
+        <pre class="has-text-success p-3 is-size-7">
 &lt;script src="{{ request.scheme }}://{{ request.get_host }}/pf.js" data-site="{{ site.site_id }}" defer&gt;&lt;/script&gt;
         </pre>
       </div>

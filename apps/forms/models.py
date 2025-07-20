@@ -6,7 +6,6 @@ from django_resized import ResizedImageField
 from colorfield.fields import ColorField
 from apps.accounts.models import Team
 from django.utils.text import slugify
-from django.core.exceptions import ValidationError
 from apps.analytics.models import VisitorSession
 
 User = get_user_model()
@@ -87,15 +86,7 @@ class Form(models.Model):
         verbose_name=_("Allow Analytics"),
         help_text=_("Indicates whether analytics are enabled for this form."),
     )
-    site_id = models.CharField(
-        max_length=255,
-        blank=True,
-        null=True,
-        verbose_name=_("Site ID"),
-        help_text=_(
-            "The ID of the site where this form is hosted, entered if analytics are enabled."
-        ),
-    )
+
     authentication_required = models.BooleanField(
         default=False,
         verbose_name=_("Authentication Required"),

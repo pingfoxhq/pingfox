@@ -21,11 +21,11 @@
     </title>
 </head>
 
-<body hx-boost="true">
+<body>
 
     {% include 'core/islands/loader.html' %}
     {% include 'core/islands/navbar.html' %}
-    <main class="container" up-main>
+    <main class="container">
         <section class="section">
             {% include 'core/islands/messages.html' %}
             {% block content %}{% endblock %}

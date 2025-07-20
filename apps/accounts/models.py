@@ -4,7 +4,6 @@ from django.utils.translation import gettext_lazy as _
 from django_resized import ResizedImageField
 from django.utils import timezone
 from django.utils.text import slugify
-from apps.billing.models import Plan
 import secrets
 
 User = get_user_model()
@@ -186,11 +185,10 @@ class Team(models.Model):
         max_length=255,
         unique=True,
         verbose_name=_("Team Slug"),
-        default=generate_team_slug,
         help_text=_("A unique identifier for the team, used in URLs."),
     )
     plan = models.ForeignKey(
-        Plan,
+        "billing.Plan",
         on_delete=models.SET_NULL,
         null=True,
         related_name="teams",
@@ -296,6 +294,14 @@ class Team(models.Model):
         if self.plan:
             return self.plan.get_feature(f"{feature_name}_limit")
         return None
+
+    def save(self, *args, **kwargs):
+        """
+        Override save method to ensure slug is unique.
+        """
+        if not self.slug:
+            self.slug = generate_team_slug(self.name)
+        super().save(*args, **kwargs)
 
 
 class TeamMember(models.Model):

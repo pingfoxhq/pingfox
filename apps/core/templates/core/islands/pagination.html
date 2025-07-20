@@ -1,43 +1,64 @@
 {% if page_views.has_other_pages %}
 <tr>
-    <td colspan="4" class="py-2 px-3 text-center">
-        <div class="flex justify-center space-x-2 items-center">
-            {% if page_views.has_previous %}
-            <a href="?page={{ page_views.previous_page_number }}&per_page={{ page_views.paginator.per_page }}"
-                class="btn btn-sm btn-outline">←
-                Previous</a>
-            {% endif %}
-            <span>Page {{ page_views.number }} of {{ page_views.paginator.num_pages }}</span>
-            {% if page_views.has_next %}
-            <a href="?page={{ page_views.next_page_number }}&per_page={{ page_views.paginator.per_page }}"
-                class="btn btn-sm btn-outline">Next →</a>
-            {% endif %}
+  <td colspan="4" class="has-text-centered py-2 px-3">
+    <nav class="pagination is-centered is-small" role="navigation" aria-label="pagination">
 
-        </div>
-    </td>
+      {% if page_views.has_previous %}
+        <a class="pagination-previous" href="{% querystring page=page_views.previous_page_number %}">← Previous</a>
+      {% else %}
+        <a class="pagination-previous" disabled>← Previous</a>
+      {% endif %}
+
+      {% if page_views.has_next %}
+        <a class="pagination-next" href="{% querystring page=page_views.next_page_number %}">Next →</a>
+      {% else %}
+        <a class="pagination-next" disabled>Next →</a>
+      {% endif %}
+
+      <ul class="pagination-list">
+        <li>
+          <span class="pagination-link is-current">Page {{ page_views.number }} of {{ page_views.paginator.num_pages }}</span>
+        </li>
+      </ul>
+    </nav>
+  </td>
 </tr>
-<!-- Go to input -->
+
 <tr>
-    <td colspan="6" class="py-2 px-3 text-center">
-        <form method="get" class="inline-block">
-            <!-- Per page -->
-            <span class="text-sm text-gray-500">Show
-                <select name="per_page" class="select select-bordered w-24"
-                    onchange="location.href='?page={{ page_views.number }}&per_page=' + this.value;">
-                    <option value="10" {% if page_views.paginator.per_page == 10 %}selected{% endif %}>10
-                    </option>
-                    <option value="25" {% if page_views.paginator.per_page == 25 %}selected{% endif %}>25
-                    </option>
-                    <option value="50" {% if page_views.paginator.per_page == 50 %}selected{% endif %}>50
-                    </option>
-                    <option value="100" {% if page_views.paginator.per_page == 100 %}selected{% endif %}>
-                        100</option>
-                </select>
-            </span>
-            <input type="number" name="page" min="1" max="{{ page_views.paginator.num_pages }}"
-                class="input input-bordered w-32 text-center" placeholder="Go to page">
-            <button type="submit" class="btn btn-sm btn-primary ml-2">Go</button>
-        </form>
-    </td>
+  <td colspan="6" class="has-text-centered py-2 px-3">
+    <form method="get" class="is-inline-block">
+      <div class="field is-grouped is-grouped-centered is-align-items-center">
+
+        <!-- Per page dropdown -->
+        <div class="control">
+          <div class="select is-small">
+            <select name="per_page"
+                    onchange="location.href='{% querystring per_page=None %}&per_page=' + this.value;">
+              <option value="10" {% if page_views.paginator.per_page == 10 %}selected{% endif %}>10</option>
+              <option value="25" {% if page_views.paginator.per_page == 25 %}selected{% endif %}>25</option>
+              <option value="50" {% if page_views.paginator.per_page == 50 %}selected{% endif %}>50</option>
+              <option value="100" {% if page_views.paginator.per_page == 100 %}selected{% endif %}>100</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Page input -->
+        <div class="control">
+          <input class="input is-small has-text-centered"
+                 type="number" name="page"
+                 min="1" max="{{ page_views.paginator.num_pages }}"
+                 placeholder="Go to page">
+        </div>
+
+        <!-- Keep per_page in hidden field -->
+        <input type="hidden" name="per_page" value="{{ page_views.paginator.per_page }}">
+
+        <!-- Submit button -->
+        <div class="control">
+          <button class="button is-small is-primary ml-2" type="submit">Go</button>
+        </div>
+      </div>
+    </form>
+  </td>
 </tr>
 {% endif %}

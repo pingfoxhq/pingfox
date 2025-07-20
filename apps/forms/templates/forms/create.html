@@ -4,19 +4,9 @@ Create a Form
 {% endblock %}
 
 {% block content %}
-<div class="is-flex is-justify-content-space-between is-align-items-center mb-4">
-    <div>
-        <h3 class="title  is-3">
-            Create a Form
-        </h3>
-        <p class="subtitle has-text-grey">
-            Create a headless form, don't worry about the backend, we will handle it.
-        </p>
-    </div>
-    <a href="{% url 'forms:list' %}" class="button is-small">
-        ← Back to Forms List
-    </a>
-</div>
-{% include 'core/partials/dashboard_tab.html' with active_tab="forms" %}
-{% include 'core/partials/create_form.html' with form=form button_text="Create" %}
+<a href="{% url 'forms:list' %}" class="button is-small mb-3">
+    ← Back to Forms List
+</a>
+{% include 'core/islands/form.html' with heading="Create a Form" subtitle="Create a headless form, don't worry about the backend, we will handle it." form=form button_text="Create" %}
+
 {% endblock content %}

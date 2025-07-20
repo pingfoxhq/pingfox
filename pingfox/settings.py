@@ -38,8 +38,11 @@ env = environ.Env(
     PINGFOX_VERIFICATION_TOKEN=(str, "default-verification-token"),
 )
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
+
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
 
 SITE_URL = env("SITE_URL", default="http://localhost:8000")
 
@@ -66,6 +69,8 @@ INSTALLED_APPS = [
     "django_cleanup.apps.CleanupConfig",
     "django_dramatiq",
     "colorfield",
+    "rest_framework",
+    "djoser",
     "apps.bulma.apps.BulmaConfig",
     "apps.core.apps.CoreConfig",
     "apps.accounts.apps.AccountsConfig",
@@ -215,5 +220,5 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 PINGFOX_SITE_ID = env("PINGFOX_SITE_ID", default="default-site-id")
 PINGFOX_JS_SRC_URL = env("PINGFOX_JS_SRC_URL", default="http://localhost:8000/pf.js")
 PINGFOX_VERIFICATION_TOKEN = env(
-    "PINGFOX_VERIFICATION_TOKEN", default="default-verification-token"
+    "PINGFOX_VERIFICATION_TOKEN"
 )

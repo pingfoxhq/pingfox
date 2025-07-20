@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-
+from django.utils import timezone
+import secrets
+from apps.accounts.models import User, Team
 
 class Plan(models.Model):
     """
@@ -23,6 +25,9 @@ class Plan(models.Model):
         verbose_name=_("Plan Price"),
         max_digits=10,
         decimal_places=2,
+        default=0.00,
+        blank=True,
+        null=True,
         help_text=_("The price of the billing plan in the INR (₹)."),
     )
     description = models.TextField(
@@ -112,3 +117,151 @@ class PlanFeature(models.Model):
 
     class Meta:
         unique_together = ("plan", "key")
+
+
+    def save(self, *args, **kwargs):
+        """
+        Override save to ensure that the feature key is unique within the plan.
+        """
+        if not self.key:
+            raise ValueError("Feature key cannot be empty.")
+        super().save(*args, **kwargs)
+
+
+def generate_redeem_code():
+    """
+    Generate a unique redeem code.
+    The code is a random alphanumeric string of length 10.
+    """
+    return secrets.token_urlsafe(10)
+
+class RedeemCode(models.Model):
+    """
+    Represents a redeem code for a billing plan.
+    """
+
+    code = models.CharField(
+        max_length=50,
+        unique=True,
+        verbose_name=_("Redeem Code"),
+        help_text=_("The unique code that can be redeemed for a billing plan."),
+    )
+    description = models.TextField(
+        blank=True,
+        verbose_name=_("Description"),
+        help_text=_("A description of what the redeem code offers."),
+    )
+    plan = models.ForeignKey(
+        Plan,
+        on_delete=models.CASCADE,
+        related_name="redeem_codes",
+        verbose_name=_("Plan"),
+        help_text=_("The billing plan that this redeem code applies to."),
+    )
+    is_active = models.BooleanField(
+        default=True,
+        verbose_name=_("Is Active"),
+        help_text=_("Indicates if the redeem code is currently active."),
+    )
+    usage_limit = models.PositiveIntegerField(
+        default=1,
+        verbose_name=_("Usage Limit"),
+        help_text=_("The maximum number of times this redeem code can be used."),
+    )
+    used_count = models.PositiveIntegerField(
+        default=0,
+        verbose_name=_("Used Count"),
+        help_text=_("The number of times this redeem code has been used."),
+    )
+    valid_from = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name=_("Valid From"),
+        help_text=_("The date and time from which the redeem code is valid."),
+    )
+    valid_until = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name=_("Valid Until"),
+        help_text=_("The date and time until which the redeem code is valid."),
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name=_("Created At"),
+        help_text=_("The date and time when the redeem code was created."),
+    )
+
+    def __str__(self):
+        return self.code
+    
+    def is_valid(self):
+        """
+        Check if the redeem code is valid based on its active status, usage limit,
+        and validity period.
+        """
+        if not self.is_active:
+            return False
+        if self.used_count >= self.usage_limit:
+            return False
+        if self.valid_from and self.valid_from > timezone.now():
+            return False
+        if self.valid_until and self.valid_until < timezone.now():
+            return False
+        return True
+    
+    def save(self, *args, **kwargs):
+        """
+        Override save to ensure the redeem code is unique and generate a new code if not provided.
+        """
+        if not self.code:
+            self.code = generate_redeem_code()
+        super().save(*args, **kwargs)
+
+
+    class Meta:
+        verbose_name = _("Redeem Code")
+        verbose_name_plural = _("Redeem Codes")
+        ordering = ["-created_at"]
+        unique_together = ("code", "plan")
+
+
+class CodeRedemption(models.Model):
+    """
+    Represents a redemption of a redeem code.
+    This model tracks which user redeemed which code and when and for which team.
+    """
+    redeem_code = models.ForeignKey(
+        RedeemCode,
+        on_delete=models.CASCADE,
+        related_name="redemptions",
+        verbose_name=_("Redeem Code"),
+        help_text=_("The redeem code that was redeemed."),
+    )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="code_redemptions",
+        verbose_name=_("User"),
+        help_text=_("The user who redeemed the code."),
+    )
+    team = models.ForeignKey(
+        Team,
+        on_delete=models.CASCADE,
+        related_name="code_redemptions",
+        verbose_name=_("Team"),
+        help_text=_("The team for which the code was redeemed."),
+    )
+    redeemed_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name=_("Redeemed At"),
+        help_text=_("The date and time when the code was redeemed."),
+    )
+
+    def __str__(self):
+        return f"{self.user.username} redeemed {self.redeem_code.code} for {self.team.name}"
+    
+    class Meta:
+        verbose_name = _("Code Redemption")
+        verbose_name_plural = _("Code Redemptions")
+        ordering = ["-redeemed_at"]
+        unique_together = ("redeem_code", "user", "team")

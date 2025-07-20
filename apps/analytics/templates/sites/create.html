@@ -10,8 +10,8 @@
         <h3 class="title is-3">Create a New Site</h3>
     </div>
     <div class="level-right">
-        <a href="{% url 'sites:list' %}" class="btn btn-sm">
-            &leftarrow; Back to sites List
+        <a href="{% url 'analytics:index' %}" class="btn btn-sm">
+            &leftarrow; Go Back
         </a>
     </div>
 </div>
@@ -20,6 +20,6 @@
     Fill out the form below to create a new site.
 </p>
 
-{% include 'core/partials/tab.html' with active_tab="sites" %}
+{% include 'core/islands/tab.html' with active_tab="analytics" %}
 {% include 'core/islands/form.html' with form=form button_text="Create" %}
 {% endblock content %}

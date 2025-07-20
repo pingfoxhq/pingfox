@@ -37,5 +37,5 @@ def verification_token(request):
     Returns the current site verification token for the analytics site verification.
     """
     return HttpResponse(
-        settings.PINGFOX_VERIFICATION_TOKEN,
+        settings.PINGFOX_VERIFICATION_TOKEN.strip(),
     )

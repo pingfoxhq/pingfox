@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% load static %}
+{% load bulma_tags %}
+
+{% block title %}Change Plan{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <h1 class="title">Change Your Billing Plan for {{ team.name }}</h1>
+
+        <form method="post" class="box mt-5">
+            <strong>Current Plan: {{ team.plan.name }}</strong>
+            <br>
+            <br>
+            {% csrf_token %}
+            <div class="field">
+                <div class="control">
+                    {{ form|bulma }}
+                </div>
+            </div>
+
+            <div class="field is-grouped is-justify-content-flex-end">
+                <div class="control">
+                    <button type="submit" class="button is-light">Change Plan</button>
+                </div>
+            </div>
+
+            
+        </form>
+        
+        <hr>
+        <!-- Redeem Code -->
+        
+        <h2 class="title is-4">Redeem a Code</h2>
+        <form method="post" class="box" action="{% url 'billing:redeem_code' %}">
+            {% csrf_token %}
+            {{  redeem_code_form|bulma }}
+            <div class="field is-grouped is-justify-content-flex-end">
+                <div class="control">
+                    <button type="submit" class="button is-light">Redeem Code</button>
+                </div>
+            </div>
+        </form>
+
+        <h2 class="title is-4">Available Plans</h2>
+        <div class="columns is-multiline">
+            {% for plan in plans %}
+            <div class="column is-4">
+                <div class="card">
+                    <div class="card-content">
+                        <p class="title is-5">{{ plan.name }}</p>
+                        <p class="subtitle is-6 has-text-grey">₹{{ plan.price }} / month</p>
+                        <p>{{ plan.description | safe }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

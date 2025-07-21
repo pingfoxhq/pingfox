@@ -15,13 +15,16 @@
 {% include 'core/islands/tab.html' with active_tab="teams" %}
 
 <div class="container px-4 pb-6 ">
-  
+
   <div class="box">
     <div class="is-flex is-justify-content-space-between is-align-items-center mb-4">
       <h1 class="title is-3">{{ team.name }}</h1>
     </div>
     <div class="is-flex is-justify-content-space-between is-align-items-center mb-4">
-      <h2 class="title is-4">{{ team.plan.name }}</h2>
+      <div>
+        <h2 class="title is-4">{{ team.plan.name }}</h2>
+        <a href="{% url 'billing:change_plan' %}" class="button is-light">Change Plan</a>
+      </div>
       {% if team.logo %}
       <figure class="image is-48x48">
         <img class="is-rounded" src="{{ team.logo.url }}" alt="{{ team.name }} Logo">
@@ -57,7 +60,8 @@
     {% if request.user.is_authenticated and request.user == team.owner %}
     <div class="mt-4">
       <a href="{% url 'accounts:teams_edit' team.slug %}" class="button is-small is-light">Edit Team</a>
-      <a href="{% url 'accounts:teams_transfer_ownership' team.slug %}" class="button is-small is-warning is-dark has-text-white">Transfer Ownership</a>
+      <a href="{% url 'accounts:teams_transfer_ownership' team.slug %}"
+        class="button is-small is-warning is-dark has-text-white">Transfer Ownership</a>
     </div>
     {% endif %}
   </div>

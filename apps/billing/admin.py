@@ -110,7 +110,7 @@ class CodeRedemptionInline(admin.TabularInline):
 class RedeemCodeAdmin(admin.ModelAdmin):
     list_display = ("code", "created_at")
     search_fields = ("code", "plan__name")
-    fields = ("code", "description", "plan", "created_at")
+    fields = ("code", "description", "plan", "created_at", "is_active", "usage_limit", "used_count")
     readonly_fields = ("created_at",)
     ordering = ("-created_at",)
     autocomplete_fields = ("plan",)

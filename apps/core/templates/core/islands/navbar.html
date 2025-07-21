@@ -23,24 +23,6 @@
   </div>
 
   <div id="navbarBasicExample" class="navbar-menu" :class="{ 'is-active': open }">
-    <div class="navbar-start">
-      <a class="navbar-item">Home</a>
-      <a class="navbar-item">Documentation</a>
-
-      <div x-data="{ dropdownOpen: false }" class="navbar-item has-dropdown" :class="{ 'is-active': dropdownOpen }">
-        <a class="navbar-link" @click.prevent="dropdownOpen = !dropdownOpen">
-          More
-        </a>
-
-        <div class="navbar-dropdown">
-          <a class="navbar-item">About</a>
-          <a class="navbar-item is-selected">Jobs</a>
-          <a class="navbar-item">Contact</a>
-          <hr class="navbar-divider">
-          <a class="navbar-item">Report an issue</a>
-        </div>
-      </div>
-    </div>
 
     <div class="navbar-end">
       {% if request.user.is_authenticated and user_teams %}

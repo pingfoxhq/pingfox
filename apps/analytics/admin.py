@@ -25,7 +25,7 @@ class SiteAdmin(admin.ModelAdmin):
         (None, {"fields": ("team", "owner", "name", "domain", "site_id")}),
         ("Status", {"fields": ("is_verified", "is_active")}),
         ("Advanced Options", {"fields": ("pageview_limit_override",)}),
-        ("Metadata", {"fields": ("created_at", "timezone", "verification_token")}),
+        ("Metadata", {"fields": ("created_at", "timezone", "verification_token", "form")}),
     )
 
     @admin.action(description="Verify selected sites")

@@ -5,11 +5,15 @@
 <p class="subtitle is-5">{{ subtitle }}</p>
 <form method="post" class="space-y-6" enctype="multipart/form-data">
     {% csrf_token %}
+    {% if form %}
     {{ form | bulma }}
-
+    {% endif %}
+    {% if form.media %}
+    {{ form.media }}
+    {% endif %}
     <div class="field">
         <div class="control">
-            <button type="submit" class="button is-primary">{{ button_text }}</button>
+            <button type="submit" class="button is-light">{{ button_text }}</button>
         </div>
     </div>
 </form>

@@ -7,25 +7,26 @@ Site Details – {{ site.name }}
 {% endblock title %}
 
 {% block content %}
+{% include 'core/islands/tab.html' with active_tab="analytics" %}
+
 <div class="level mb-5">
   <div class="level-left">
     <div class="level-item">
       <div>
         <h1 class="title ">{{ site.name }}</h1>
         <p class="subtitle is-6 mt-2">
-          Site ID: <span class=" is-family-monospace">{{ site.site_id }}</span>
+          Site ID: <span class="is-family-monospace">{{ site.site_id }}</span>
         </p>
       </div>
     </div>
   </div>
   <div class="level-right">
     <div class="level-item">
-      <a href="{% url 'analytics:index' %}" class="button is-small">← Back to Analytics</a>
+      <a href="{% url 'analytics:index' %}" class="button is-small is-light">← Back to Analytics</a>
     </div>
   </div>
 </div>
 
-{% include 'core/islands/tab.html' with active_tab="analytics" %}
 
 <div class="box mb-5 has-background-black">
   {% include 'analytics/islands/chart.html' %}
@@ -52,8 +53,8 @@ Site Details – {{ site.name }}
       <h3 class="title is-6 ">📄 Top Pages</h3>
       <ul>
         {% for page in top_pages %}
-        <li class="is-flex is-justify-content-space-between is-7 mb-2">
-          <span title="{{ page.url }}">{{ page.url|truncatechars:60 }}</span>
+        <li class="is-flex is-justify-content-space-between mb-2">
+          <span title="{{ page.url }}">{{ page.url|truncatechars:45 }}</span>
           <span class="tag is-info">{{ page.view_count }} views</span>
         </li>
         {% empty %}
@@ -85,12 +86,12 @@ Site Details – {{ site.name }}
 
 <div class="mb-6">
   <h3 class="title is-5 ">Recent Views</h3>
-  <a href="{% url 'analytics:sites_download_csv' site.site_id %}" class="button is-small is-outlined mb-3">
+  <a href="{% url 'analytics:sites_download_csv' site.site_id %}" class="button is-small is-outlined mb-3 is-light">
     Download as CSV
   </a>
 
   <div class="table-container">
-    <table class="table is-fullwidth is-striped is-hoverable is-size-7">
+    <table class="table is-fullwidth is-striped is-bordered is-size-7">
       <thead>
         <tr>
           <th>Time</th>
@@ -103,7 +104,7 @@ Site Details – {{ site.name }}
         {% for view in page_views %}
         <tr>
           <td>{{ view.timestamp|date:"H:i:s" }}</td>
-          <td class="has-text-success is-family-monospace">{{ view.visitor.pf_id|truncatechars:10 }}</td>
+          <td class="has-text-success is-family-monospace" title="{{ view.visitor.pf_id }}">{{ view.visitor.pf_id|truncatechars:10 }}</td>
           <td>{{ view.url }}</td>
           <td>{{ view.referrer|default:"—" }}</td>
         </tr>
@@ -124,16 +125,21 @@ Site Details – {{ site.name }}
 
     <div class="field">
       <div class="control">
-        <pre class="has-text-success p-3 is-size-7">
-&lt;script src="{{ request.scheme }}://{{ request.get_host }}/pf.js" data-site="{{ site.site_id }}" defer&gt;&lt;/script&gt;
-        </pre>
-      </div>
-      <div class="control mt-2">
-        <button class="button is-small is-outlined" onclick="navigator.clipboard.writeText(`<script src='{{ request.scheme }}://{{ request.get_host }}/pf.js' data-site='{{ site.site_id }}' defer></script>`)">
-          Copy Snippet
-        </button>
+        <div class="columns is-vcentered">
+          <div class="column">
+            <pre class="p-3">
+&lt;script src="{{ request.scheme }}://{{ request.get_host }}/pf.js" data-site="{{ site.site_id }}" defer&gt;&lt;/script&gt;</pre>
+          </div>
+          <div class="column is-narrow">
+            <div class="control">
+              <button class="button is-light"
+                onclick="navigator.clipboard.writeText(`<script src='{{ request.scheme }}://{{ request.get_host }}/pf.js' data-site='{{ site.site_id }}' defer></script>`)">
+                Copy Snippet
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
-</div>
-{% endblock content %}
+  {% endblock content %}

@@ -5,20 +5,22 @@ Edit a Form
 {% endblock %}
 
 {% block content %}
-<div class="flex items-center justify-between">
+<div class="is-flex is-justify-content-space-between is-align-items-center mb-4">
+    <div>
 
-    <h3 class="title is-3 has-text-weight-bold text-white mb-2">
-        Edit a Form
-    </h3>
-    <a href="{% url 'forms:list' %}" class="button is-primary is-small">
+        <h3 class="title is-3 has-text-weight-bold text-white mb-2">
+            Edit a Form
+        </h3>
+        <p class="subtitle text-gray-400 mb-5">
+            Edit the details of your form. You can change the name, and other settings.
+        </p>
+    </div>
+    <a href="{% url 'forms:list' %}" class="button is-light is-small">
         &leftarrow; Back to Forms List
     </a>
 </div>
-<p class="subtitle text-gray-400 mb-5">
-    Edit the details of your form. You can change the name, and other settings.
-</p>
-{% include 'core/partials/dashboard_tab.html' with active_tab="forms" %}
-{% include 'core/partials/create_form.html' with form=form button_text="Save" %}
+{% include 'core/islands/tab.html' with active_tab="forms" %}
+{% include 'core/islands/form.html' with form=form button_text="Save" %}
 
 {% if style_form %}
 <div class="mt-8">
@@ -27,7 +29,7 @@ Edit a Form
         {% csrf_token %}
         {{ style_form.media }}
         {{ style_form | bulma }}
-        <button class="btn btn-primary" type="submit">Update Style</button>
+        <button class="button is-light" type="submit">Update Style</button>
     </form>
 </div>
 {% endif %}

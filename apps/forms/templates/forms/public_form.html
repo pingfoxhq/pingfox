@@ -9,11 +9,11 @@
 
 {% block content %}
 <main class="container">
-  
+
   {% if form_obj.style.logo %}
-    <div class="logo">
-      <img src="{{ form_obj.style.logo.url }}" alt="Logo">
-    </div>
+  <div class="logo">
+    <img src="{{ form_obj.style.logo.url }}" alt="Logo">
+  </div>
   {% endif %}
 
   <h1>{{ form_obj.name }}</h1>
@@ -22,18 +22,38 @@
   <form method="post" action="{% url 'public_forms:submit' form_obj.slug %}">
     {% csrf_token %}
     {{ form }}
-    
+
     {% if form_obj.allow_analytics %}
-      <input type="hidden" name="site_id" value="{{ form_obj.site_id }}">
+    <input type="hidden" name="site_id" value="{{ form_obj.site_id }}">
     {% endif %}
-      
+
+    {% if not form_obj.allow_multiple_submissions %}
+    <!-- Get the pf_id from the localstorage -->
+    <input type="hidden" name="pf_id" id="pf_id" value="">
+    {% endif %}
+
+
     <button class="button" type="submit">{{ form_obj.button_text }}</button>
   </form>
 
 </main>
 
 {% if form_obj.allow_analytics %}
-  <script src='http://localhost:8000/pf.js' data-site='{{ form_obj.site_id }}' defer></script>
+<script src='http://localhost:8000/pf.js' data-site='{{ form_obj.site.site_id }}' defer></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // Check if pf_id exists in localStorage
+    const pfId = localStorage.getItem('pf_id');
+    if (pfId) {
+      document.getElementById('pf_id').value = pfId;
+    } else {
+      // Generate a new pf_id and store it in localStorage
+      const newPfId = 'pf_' + Math.random().toString(36).substr(2, 9);
+      localStorage.setItem('pf_id', newPfId);
+      document.getElementById('pf_id').value = newPfId;
+    }
+  });
+</script>
 {% endif %}
-  
+
 {% endblock %}

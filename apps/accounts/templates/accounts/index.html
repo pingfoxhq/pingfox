@@ -32,7 +32,7 @@
         <div class="level is-mobile">
           <div class="level-left">
             <figure class="image is-96x96 mr-4">
-              <img class="is-rounded" src="{{ user.userprofile.avatar.url }}" alt="Avatar">
+              <img class="is-rounded avatar" src="{{ user.userprofile.avatar.url }}" alt="Avatar">
             </figure>
             <div class="level-item">
               {{ pform.avatar|bulma }}
@@ -59,9 +59,9 @@
           {% endfor %}
         </div>
 
-        <div class="is-flex is-justify-content-flex-end mt-4 pt-4" style="border-top: 1px solid #ccc;">
-          <a href="{% url 'accounts:index' %}" class="button is-light is-small mr-2">Cancel</a>
-          <button type="submit" class="button is-primary is-small">Save</button>
+        <div class="is-flex is-justify-content-flex-end pt-4">
+          <a href="{% url 'accounts:index' %}" class="button is-light is-small is-outlined mr-2">Cancel</a>
+          <button type="submit" class="button is-small is-light">Save</button>
         </div>
       </div>
     </form>

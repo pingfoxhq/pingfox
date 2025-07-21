@@ -28,6 +28,7 @@
     let ctx = document.getElementById("siteChart").getContext("2d");
     let chartInstance = null;
     let range = localStorage.getItem('chartRange') || 'daily';
+    document.querySelector(`.tab-btn[data-range="${range}"]`)?.classList.add('is-active');
 
     const fetchChartData = async (range) => {
         const res = await fetch(`/api/analytics/chart-data/?site_id=${site_id}&range=${range}`, {

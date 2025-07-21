@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 
 from django.contrib.auth.decorators import login_required
+
+from apps.analytics.models import VisitorSession
 from .forms import PingFoxFormCreatationForm, DynamicFormSchemaForm, FormStyleForm
 from django.contrib import messages
 from .models import Form, FormSubmission
@@ -11,6 +13,7 @@ from django.contrib import messages
 from apps.forms.utils import (
     convert_form_to_schema,
     create_form_from_form_model,
+    get_pf_id,
 )
 
 from apps.accounts.utils import get_current_team
@@ -99,7 +102,7 @@ def form_delete(request, slug):
         messages.success(request, "Form deleted successfully.")
         return redirect("forms:list")
     form_class = create_form_from_form_model(form)
-    return render(request, "forms/delete.html", {"form": form_class})
+    return render(request, "forms/delete.html")
 
 
 @login_required
@@ -270,6 +273,19 @@ def form_public_view(request, slug):
 @require_POST
 def form_submit_view(request, slug):
     form_obj = get_object_or_404(Form, slug=slug)
+    pf_id = get_pf_id(request)
+    if not form_obj.is_active:
+        return HttpResponseBadRequest("This form is not active or does not exist.")
+
+    if not form_obj.allow_multiple_submissions:
+        # Check if the visitor has already submitted the form
+        visitor = form_obj.visitors.filter(pf_id=pf_id).first()
+        if visitor:
+            return HttpResponseBadRequest(
+                "You have already submitted this form. Multiple submissions are not allowed."
+            )
+
+    # The Main Part
     form_class = create_form_from_form_model(form_obj)
     form = form_class(request.POST)
     if form.is_valid():
@@ -282,7 +298,11 @@ def form_submit_view(request, slug):
         form_obj.save()
 
         # Add the visitor to the form's visitors
-        # :TODO: Implement visitor tracking
+        visitor, created = VisitorSession.objects.get_or_create(
+            pf_id=pf_id,
+            defaults={"user_agent": request.META.get("HTTP_USER_AGENT", "")},
+        )
+        form_obj.visitors.add(visitor)
 
         if form_obj.redirect_url:
             return redirect(form_obj.redirect_url)

@@ -13,18 +13,22 @@ def create_form_analytics(sender, instance, created, **kwargs):
 
         if instance.allow_analytics:
             # Create a default VisitorSession for the form
-            site = Site.objects.create(
+            site, created = Site.objects.get_or_create(
                 team=instance.team,
                 owner=instance.owner,
-                name=f"{instance.name} Analytics",
+                name=f"{instance.name} [Analytics]",
                 is_active=True,
                 is_verified=True,
                 domain=settings.SITE_URL,
                 url=f"{settings.SITE_URL}{instance.get_absolute_url()}",
+                form=instance,
             )
             instance.site_id = site.site_id
             instance.save()
 
+
 @receiver(pre_delete, sender=Form)
 def delete_form_analytics(sender, instance, **kwargs):
-    Site.objects.filter(url=f"{settings.SITE_URL}{instance.get_absolute_url()}").delete()
+    Site.objects.filter(
+        url=f"{settings.SITE_URL}{instance.get_absolute_url()}"
+    ).delete()

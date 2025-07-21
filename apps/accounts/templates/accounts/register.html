@@ -10,7 +10,7 @@ Register an Account
     {{ form | bulma }}
     {% csrf_token %}
     <div class="field">
-        <button type="submit" class="button is-success">Signup</button>
+        <button type="submit" class="button is-light">Signup</button>
     </div>
     <div class="field">
         <small>Already have an Account? <a href="{% url 'accounts:login' %}">Log In</a></small>

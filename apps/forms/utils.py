@@ -163,3 +163,15 @@ def convert_form_to_schema(form: Form):
         for field in form.fields.all()
     ]
     return schema
+
+
+def get_pf_id(request):
+    """
+    Get the pf_id from the request, either from POST data or local storage.
+    If not found, generate a new one and store it in local storage.
+    """
+    pf_id = request.POST.get("pf_id") or request.session.session_key
+    if not pf_id:
+        request.session.create()
+        pf_id = request.session.session_key
+    return pf_id

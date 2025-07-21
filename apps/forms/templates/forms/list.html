@@ -7,7 +7,7 @@
     <h3 class="title is-3 ">Your Forms ({{ current_team.forms.count }}/{{ max_forms }})</h3>
   </div>
   <div class="level-right">
-    <a href="{% url 'forms:create' %}" class="button is-primary is-small">+ Create New Form</a>
+    <a href="{% url 'forms:create' %}" class="button is-light is-small">+ Create New Form</a>
   </div>
 </div>
 
@@ -21,16 +21,16 @@
 <div class="columns is-multiline">
   {% for form in forms %}
   <div class="column is-12">
-    <div class="box has-background-dark">
+    <div class="box">
       <div class="level is-mobile mb-2">
         <div class="level-left">
           <div>
-            <a href="{% url 'forms:builder' form.slug %}" class="is-size-5  has-text-weight-medium hover-underline">
+            <a href="{% url 'forms:builder' form.slug %}" class="is-size-5 has-text-weight-medium hover-underline">
               {{ form.name }}
             </a>
             <div class="is-flex is-align-items-center mt-1">
               <a href="{% url 'public_forms:public' form.slug %}" hx-boost="false">
-                <span class="is-size-7 ">/{{ form.slug }}</span>
+                <span class="is-size-7 is-monospace ">/{{ form.slug }}</span>
               </a>
               <button class="button is-small is-text ml-2 px-2 py-0"
                 x-on:click="navigator.clipboard.writeText('{{ request.build_absolute_uri }}{{ form.get_absolute_url }}')">
@@ -41,9 +41,9 @@
         </div>
         <div class="level-right">
           {% if form.is_active %}
-          <span class="tag is-success is-light is-size-7">Active</span>
+          <span class="tag is-success is-size-7">Active</span>
           {% else %}
-          <span class="tag is-danger is-light is-size-7">Inactive</span>
+          <span class="tag is-danger is-size-7">Inactive</span>
           {% endif %}
         </div>
       </div>
@@ -58,15 +58,21 @@
       </div>
 
       <div class="buttons are-small">
-        <a href="{% url 'forms:edit' form.slug %}" class="button">Edit Info</a>
-        <a href="{% url 'forms:schema' form.slug %}" hx-boost="false" class="button is-info is-light">View Schema</a>
+        <a href="{% url 'forms:edit' form.slug %}" class="button is-light">Edit Info</a>
+        <a href="{% url 'forms:schema' form.slug %}" hx-boost="false" class="button">View Schema</a>
         {% if form.is_locked %}
         <span class="tag is-warning is-light">Frozen</span>
         {% else %}
-        <a href="{% url 'forms:builder' form.slug %}" class="button is-info is-light">Edit Builder</a>
-        <a href="{% url 'forms:freeze' form.slug %}" class="button is-danger is-light">Freeze</a>
+        <a href="{% url 'forms:builder' form.slug %}" class="button">Edit Builder</a>
+        
+        {% if form.allow_analytics %}
+        <a href="{% url 'analytics:sites_details' form.site.site_id %}" class="button">View Analytics</a>
+        
         {% endif %}
-        <a href="{% url 'forms:delete' form.slug %}" class="button is-danger is-light">Delete</a>
+          
+        <a href="{% url 'forms:freeze' form.slug %}" class="button">Freeze</a>
+        {% endif %}
+        <a href="{% url 'forms:delete' form.slug %}" class="button">Delete</a>
       </div>
     </div>
   </div>
@@ -75,7 +81,7 @@
 {% else %}
 <div class="has-text-centered py-6 ">
   <p class="is-size-5">You haven’t created any forms yet.</p>
-  <a href="{% url 'forms:create' %}" class="button mt-4">Create Your First Form</a>
+  <a href="{% url 'forms:create' %}" class="button mt-4 is-light">Create Your First Form</a>
 </div>
 {% endif %}
 {% endblock %}

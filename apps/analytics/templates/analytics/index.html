@@ -8,9 +8,16 @@ Analytics Dashboard
   <div class="level-left">
     <h3 class="title is-3 ">Your Sites ({{ sites.count }}/{{ max_sites }})</h3>
   </div>
+  
+  {% if can_create %}
   <div class="level-right">
-    <a href="{% url 'analytics:sites_create' %}" class="button is-primary is-small">+ Create New Site</a>
+    <a href="{% url 'analytics:sites_create' %}" class="button is-light is-small">+ Create New Site</a>
   </div>
+  {% else %}
+  <div class="level-right">
+    <span class="tag">You have reached the maximum number of sites.</span>
+  </div>
+  {% endif %}
 </div>
 
 <p class="subtitle mb-5">
@@ -26,7 +33,7 @@ Analytics Dashboard
     <div class="box">
       <div class="is-flex is-justify-content-space-between is-align-items-flex-start">
         <div>
-          <a href="{% url 'analytics:sites_edit' site.site_id %}" class=" has-text-weight-semibold is-size-5">
+          <a href="{% url 'analytics:sites_details' site.site_id %}" class=" has-text-weight-semibold is-size-5">
             {{ site.name }} [{{ site.domain }}]
           </a>
           <p class="is-size-7  mt-1">{{ site.site_id }}</p>
@@ -48,11 +55,11 @@ Analytics Dashboard
       </div>
 
       <div class="mt-4 buttons are-small">
-        <a href="{% url 'analytics:sites_details' site.site_id %}" class="button is-link is-light">Details</a>
+        <a href="{% url 'analytics:sites_details' site.site_id %}" class="button is-light">Details</a>
         <a href="{% url 'analytics:sites_edit' site.site_id %}" class="button is-dark">Edit</a>
-        <a href="{% url 'analytics:sites_delete' site.site_id %}" class="button is-danger is-light">Delete</a>
+        <a href="{% url 'analytics:sites_delete' site.site_id %}" class="button is-danger">Delete</a>
         {% if not site.is_verified %}
-        <a href="{% url 'analytics:sites_verify' site.site_id %}" class="button is-warning is-light">Verify</a>
+        <a href="{% url 'analytics:sites_verify' site.site_id %}" class="button is-warning">Verify</a>
         {% endif %}
       </div>
 

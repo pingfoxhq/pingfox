@@ -3,14 +3,75 @@
     // thin outline
     $box-shadow: none,
     $tabs-boxed-link-active-background-color: black,
+    $tabs-link-active-color: white,
+    $tabs-link-active-border-bottom-color: white,
+    $tabs-border-bottom-width: 4px,
     $navbar-background-color: black,
+    $navbar-dropdown-background-color: black,
+    $table-background-color: black,
+    $table-cell-border-color: rgba(255, 255, 255, 0.1),
 );
 
-body {
-    background-color: rgb(0, 0, 0);
+
+:root {
+    --bulma-dark-invert-l: 100%;
+    --bulma-body-background-color: rgb(0, 0, 0);
 }
-.box, .card {
+
+.menu {
+    --bulma-menu-item-background-l: 0%;
+    --bulma-menu-item-background-l-delta: 1%;
+    --bulma-menu-item-hover-background-l-delta: 10%;
+    --bulma-menu-item-selected-background-l: 100%;
+    --bulma-menu-item-selected-color-l: 0%;
+}
+
+code {
+    color: rgb(255, 255, 255);
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+pre {
+    color: rgb(255, 255, 255);
+    background-color: rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 1rem;
+    border-radius: 4px;
+}
+
+
+
+a {
+    color: rgb(255, 255, 255);
+}
+
+.box,
+.card {
     background-color: rgb(0, 0, 0);
     border: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow: none;
+}
+
+.input, .textarea, .select select {
+    --bulma-input-border-l: 20%;
+    --bulma-input-focus-s: 0%;
+    --bulma-input-color-l: 100%;
+    --bulma-input-background-l: 0%;
+}
+
+.navbar {
+  --bulma-navbar-dropdown-border-l: 0%;
+  --bulma-navbar-dropdown-arrow: #fff;
+  --bulma-navbar-dropdown-item-l: 0%;
+  --bulma-navbar-dropdown-item-background-l: 1%;
+  --bulma-navbar-dropdown-item-color-l: 100%;
+  --bulma-navbar-divider-background-l: 100%;
+  --bulma-navbar-divider-height: 0;
+  --bulma-navbar-bottom-box-shadow-size: 0;
+}
+
+
+.clr-field>button{
+    z-index: 20;
+    border-radius: 0 4px 4px 0;
 }

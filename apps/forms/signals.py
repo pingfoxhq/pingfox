@@ -1,10 +1,11 @@
 from django.dispatch import receiver
 from django.db.models.signals import post_save, pre_delete
-from apps.forms.models import Form, FormStyle
+from apps.forms.models import Form, FormStyle, FormSubmission
 from apps.analytics.models import PageView, VisitorSession
 from apps.analytics.models import Site
 from django.conf import settings
-
+from apps.hooks.models import WebhookEvent
+from apps.hooks.tasks import deliver_webhook
 
 @receiver(post_save, sender=Form)
 def create_form_analytics(sender, instance, created, **kwargs):
@@ -32,3 +33,18 @@ def delete_form_analytics(sender, instance, **kwargs):
     Site.objects.filter(
         url=f"{settings.SITE_URL}{instance.get_absolute_url()}"
     ).delete()
+
+
+@receiver(post_save, sender=FormSubmission)
+def create_form_submission_webhook(sender, instance, created, **kwargs):
+    if created:
+        # Trigger a webhook event for the new form submission
+        WebhookEvent.objects.create(
+            event_type="form_submission",
+            data={
+                "form_id": instance.form.id,
+                "submission_data": instance.data,
+                "created_at": instance.created_at.isoformat(),
+            },
+            form=instance.form,
+        )

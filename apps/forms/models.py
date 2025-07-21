@@ -109,6 +109,20 @@ class Form(models.Model):
         help_text=_("URL to redirect users after form submission."),
     )
 
+    webhook_url = models.URLField(
+        blank=True,
+        null=True,
+        verbose_name=_("Webhook URL"),
+        help_text=_("URL to send webhook notifications for form submissions."),
+    )
+    webhook_secret = models.CharField(
+        max_length=64,
+        blank=True,
+        null=True,
+        verbose_name=_("Webhook Secret"),
+        help_text=_("Secret key used to sign webhook payloads."),
+    )
+
     allow_multiple_submissions = models.BooleanField(
         default=True,
         verbose_name=_("Allow Multiple Submissions"),

@@ -1,6 +1,6 @@
 from django.core.exceptions import PermissionDenied
 from functools import wraps
-from apps.teams.models import Team
+from apps.accounts.models import Team
 from apps.core.utils import get_or_null
 
 def plan_required(feature_name):

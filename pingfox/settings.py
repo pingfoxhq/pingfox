@@ -77,6 +77,7 @@ INSTALLED_APPS = [
     "apps.billing.apps.BillingConfig",
     "apps.forms.apps.FormsConfig",
     "apps.analytics.apps.AnalyticsConfig",
+    "apps.hooks.apps.HooksConfig",
 ]
 
 

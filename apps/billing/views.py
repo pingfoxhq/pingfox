@@ -23,6 +23,11 @@ def change_plan(request):
         form = ChangePlanForm(request.POST)
         if form.is_valid():
             # Process the form data and change the plan
+            # :TODO: Add logic to handle plan change
+            # For now, we will do nothing and just show a success message
+            # For now, we will just use the redeem code form for the payment
+            messages.success(request, "Billing plan change request submitted.")
+            return redirect("billing:change_plan")
             new_plan = form.cleaned_data["plan"]
             team.plan = new_plan
             team.save()

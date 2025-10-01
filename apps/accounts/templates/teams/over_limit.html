@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}
+Resource Over Limit
+{% endblock %}
+
+
+{% block content %}
+<p>You have reached the maximum limit for creating new resources.</p>
+<p>Please consider upgrading your plan or deleting some existing resources to continue.</p>
+<p><a href="{% url 'billing:change_plan' %}">Upgrade your plan</a></p>
+{% endblock content %}

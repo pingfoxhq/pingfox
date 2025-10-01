@@ -1,11 +1,12 @@
 import logging
 from django.shortcuts import redirect, resolve_url
 from django.contrib import messages
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.urls import resolve
 from django.utils.deprecation import MiddlewareMixin
 
 from .models import UserActivation
+from apps.accounts.utils import get_current_team
 from apps.core.utils import get_or_null, is_htmx  # assume you have `is_htmx`
 
 logger = logging.getLogger(__name__)
@@ -71,3 +72,29 @@ class UserActivationMiddleware(MiddlewareMixin):
         # Regular web request
         messages.info(request, "Please activate your account.")
         return redirect("accounts:activate")
+
+
+class TeamContextMiddleware(MiddlewareMixin):
+    """
+    Middleware to add the current team to the request context.
+    And redirect to team creation if no team is set.
+    """
+    EXTEMPT_URLS = [
+        "accounts:login",
+        "accounts:logout",
+        "accounts:register",
+        "accounts:resend_activation",
+        "accounts:activate",
+        "core:home",
+        "core:onboarding",
+        "core:verification_token",
+        "core:home_unauth",
+    ]
+    def __init__(self, get_response):
+        super().__init__(get_response)
+        self.exempt_paths = set(resolve_url(name) for name in self.EXTEMPT_URLS)
+
+    def process_request(self, request):
+        request.team = get_current_team(request)
+        if isinstance(request.team, HttpResponse):
+            return request.team

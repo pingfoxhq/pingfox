@@ -25,10 +25,6 @@ def onboarding(request):
     """
     Render the onboarding page for new users.
     """
-    if not len(get_user_teams(request)) > 0:
-        messages.info(request, "Please create a team to get started.")
-        return redirect("teams:create")
-
     return render(request, "core/onboarding.html")
 
 

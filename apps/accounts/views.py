@@ -68,7 +68,7 @@ def register_view(request):
     """
     form = UserSignupForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
-        user = form.save(commit=False)
+        user = form.save()
         login(request, user)
         messages.success(
             request,
@@ -260,3 +260,11 @@ def team_edit(request, slug):
         messages.success(request, "Team details updated successfully!")
         return redirect("accounts:teams_details", slug=team.slug)
     return render(request, "teams/edit.html", {"form": form, "team": team})
+
+
+@login_required
+def teams_over_limit(request):
+    """
+    Render the teams over limit page.
+    """
+    return render(request, "teams/over_limit.html")

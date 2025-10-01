@@ -43,7 +43,8 @@ class Site(models.Model):
     )
     domain = models.CharField(
         max_length=255,
-        unique=True,
+        blank=True,
+        null=True,
         verbose_name=_("Domain"),
         help_text=_(
             "The domain name for this site (e.g. 'example.com' - no protocol)."

@@ -10,6 +10,7 @@ from django.views.decorators.http import require_POST
 import json
 from django.http import HttpResponseBadRequest, JsonResponse, HttpResponse
 from django.contrib import messages
+from apps.accounts.decorators import require_team, enforce_team_resource_limit
 from apps.forms.utils import (
     convert_form_to_schema,
     create_form_from_form_model,
@@ -26,23 +27,21 @@ def form_index(request):
     """
     return redirect("forms:list")
 
-
+@require_team
 @login_required
 def form_list(request):
     """
     Render the list of forms for the authenticated user.
     """
-    # Fetch forms created by the user or associated with their team
-    team = get_current_team(request)
-    forms = team.forms.all()
-    max_forms = team.get_limit("forms")
+    forms = request.team.forms.all()
+    max_forms = request.team.get_limit("forms")
     return render(
         request,
         "forms/list.html",
-        {"forms": forms, "team": team, "max_forms": max_forms},
+        {"forms": forms, "max_forms": max_forms},
     )
 
-
+@enforce_team_resource_limit("forms")
 @login_required
 def form_create(request):
     """

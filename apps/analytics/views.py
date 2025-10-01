@@ -108,7 +108,10 @@ def index(request):
     Render the analytics index page for the authenticated user.
     This page lists all sites created by the user and provides options to create, edit, or delete sites.
     """
-    max_sites = get_current_team(request).feature_limit("sites_limit")
+    team = get_current_team(request)
+    if isinstance(team, HttpResponse):
+        return team
+    max_sites = team.get_limit("sites") if team else 0
     sites = Site.objects.filter(team=get_current_team(request), form__isnull=True)
     can_create = not get_current_team(request).is_limit_exceeded("sites") if get_current_team(request) else True
     return render(

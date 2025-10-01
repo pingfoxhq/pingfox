@@ -399,6 +399,14 @@ class FormSubmission(models.Model):
 
     def __str__(self):
         return f"Submission for {self.form.name} at {self.submitted_at}"
+    
+    @property
+    def cleaned_data(self):
+        """
+        Returns the cleaned data from the submission.
+        This can be used to access the form fields in a structured way.
+        """
+        return self.data
 
     class Meta:
         verbose_name = _("Form Submission")

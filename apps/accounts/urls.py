@@ -11,6 +11,7 @@ urlpatterns = [
     path("resend-activation/", views.resend_activation_view, name="resend_activation"),
 
     # Teams URLs
+    path("over-limit/", views.teams_over_limit, name="teams_over_limit"),
     path("switch/", views.switch_team_view, name="teams_switch"),
     path("create/", views.team_create, name="teams_create"),
     path("edit/<slug:slug>/", views.team_edit, name="teams_edit"),

@@ -21,6 +21,8 @@ class PingFoxFormCreatationForm(forms.ModelForm):
             "allow_multiple_submissions",
             "allow_analytics",
             "button_text",
+            "webhook_url",
+            "webhook_secret",
         ]
 
 class DynamicFormSchemaForm(forms.Form):

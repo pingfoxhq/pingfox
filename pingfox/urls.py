@@ -18,7 +18,7 @@ urlpatterns = [
             [
                 path("analytics/", include("apps.analytics.api_urls")),
                 path("accounts/", include("djoser.urls")),
-            ]
+            ],
         ),
     ),
 ]

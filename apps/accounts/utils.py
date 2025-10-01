@@ -29,4 +29,4 @@ def get_user_teams(request):
     """
     Get all teams associated with the user.
     """
-    return request.user.teams.all() if request.user.is_authenticated else []
+    return request.user.teams.all() if request.user.is_authenticated else None

@@ -3,10 +3,9 @@
 import requests
 import json
 import dramatiq
-from django.utils import timezone
 from .models import WebhookEvent
 from .serializers import WebhookEventSerializer
-from utils import generate_webhook_signature
+from .utils import generate_webhook_signature
 
 @dramatiq.actor
 def deliver_webhook(event_id: str, webhook_url: str, secret: str):

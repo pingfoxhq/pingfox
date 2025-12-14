@@ -179,9 +179,10 @@ function formBuilder(slug) {
 
       addField(fieldType) {
         const baseName = fieldType.label.toLowerCase().replace(/\s+/g, '_');
+        
         let name = baseName;
         let counter = 1;
-
+        
         // Ensure the name is unique
         while (this.fields.some(f => f.name === name)) {
           name = `${baseName}_${counter}`;

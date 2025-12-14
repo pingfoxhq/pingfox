@@ -11,7 +11,7 @@ def create_form_class_from_schema(schema):
     existing_names = set()
     for index, field in enumerate(schema):
         label = field.get("label", "Field")
-        base_name = field.get("name") or label.lower().replace(" ", "_")
+        base_name = label.lower().replace(" ", "_") or field.get("name")
         name = base_name
 
         # Ensure uniqueness

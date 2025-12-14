@@ -63,15 +63,14 @@
         {% if form.is_locked %}
         <span class="tag is-warning is-light">Frozen</span>
         {% else %}
+        <a href="{% url 'forms:freeze' form.slug %}" class="button">Freeze</a>
         <a href="{% url 'forms:builder' form.slug %}" class="button">Edit Builder</a>
-        
+        {% endif %}
         {% if form.allow_analytics %}
         <a href="{% url 'analytics:sites_details' form.site.site_id %}" class="button">View Analytics</a>
         
         {% endif %}
           
-        <a href="{% url 'forms:freeze' form.slug %}" class="button">Freeze</a>
-        {% endif %}
         <a href="{% url 'forms:delete' form.slug %}" class="button">Delete</a>
       </div>
     </div>

@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="max-w-2xl mx-auto mt-10 bg-base-200 border border-base-300 rounded-xl p-6 shadow">
-  <h1 class="text-2xl font-bold text-white mb-4">🧊 Freeze Form</h1>
+  <h1 class="title is-3">🧊 Freeze Form</h1>
   <p class="text-sm text-gray-400 mb-6">
     Freezing a form locks its structure. You won’t be able to change its schema or field configuration after this.
     This is useful for preserving data integrity once submissions start.
@@ -20,8 +20,8 @@
       <div class="alert alert-warning mb-4">
         <strong>Warning:</strong> Once frozen, this form cannot be edited.
       </div>
-      <button type="submit" class="btn btn-error">🔒 Freeze Form</button>
-      <a href="{% url 'forms:list' %}" class="btn btn-outline ml-2">Cancel</a>
+      <button type="submit" class="button is-danger">🔒 Freeze Form</button>
+      <a href="{% url 'forms:list' %}" class="button is-outline ml-2">Cancel</a>
     </form>
   {% endif %}
 </div>

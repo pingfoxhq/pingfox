@@ -69,8 +69,9 @@ INSTALLED_APPS = [
     "django_cleanup.apps.CleanupConfig",
     "django_dramatiq",
     "colorfield",
+    "corsheaders",
     "rest_framework",
-    "djoser",
+    "rest_framework_simplejwt.token_blacklist",
     "apps.bulma.apps.BulmaConfig",
     "apps.core.apps.CoreConfig",
     "apps.accounts.apps.AccountsConfig",
@@ -91,6 +92,7 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -100,7 +102,19 @@ MIDDLEWARE = [
 ]
 
 
-INSTALLED_APPS += []
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://localhost:5173",
+]
+CORS_ALLOW_CREDENTIALS = (
+    True  # TF? Allow cookies to be included in cross-site HTTP requests
+)
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:3000",
+    "http://localhost:5173",
+]
+
 
 DRAMATIQ_BROKER = {
     "BROKER": "dramatiq.brokers.redis.RedisBroker",
@@ -220,6 +234,27 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 PINGFOX_SITE_ID = env("PINGFOX_SITE_ID", default="default-site-id")
 PINGFOX_JS_SRC_URL = env("PINGFOX_JS_SRC_URL", default="http://localhost:8000/pf.js")
-PINGFOX_VERIFICATION_TOKEN = env(
-    "PINGFOX_VERIFICATION_TOKEN"
-)
+PINGFOX_VERIFICATION_TOKEN = env("PINGFOX_VERIFICATION_TOKEN")
+
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework.authentication.SessionAuthentication",
+        "apps.accounts.authentication.CookieJWTAuthentication",
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
+    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
+}
+
+
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "AUTH_HEADER_TYPES": ("Bearer",),
+    "AUTH_COOKIE": "access",
+    "AUTH_COOKIE_REFRESH": "refresh",
+}

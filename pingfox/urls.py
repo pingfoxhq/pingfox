@@ -3,6 +3,12 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+    TokenBlacklistView,
+)
+
 urlpatterns = [
     path("", include("apps.core.urls")),
     path("", include("apps.analytics.script_urls")),
@@ -16,8 +22,18 @@ urlpatterns = [
         "api/",
         include(
             [
+                path(
+                    "auth/",
+                    include(
+                        [
+                            path(
+                                "",
+                                include("apps.accounts.api_urls"),
+                            ),
+                        ]
+                    ),
+                ),
                 path("analytics/", include("apps.analytics.api_urls")),
-                path("accounts/", include("djoser.urls")),
             ],
         ),
     ),

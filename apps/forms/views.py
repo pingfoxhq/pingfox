@@ -258,7 +258,7 @@ def form_public_view(request, slug):
     """
     form_obj = get_object_or_404(Form, slug=slug, is_active=True)
     form_class = create_form_from_form_model(form_obj)
-    form = form_class()
+    form = form_class(request.GET or None)
     return render(
         request,
         "forms/public_form.html",
